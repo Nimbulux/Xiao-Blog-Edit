@@ -1,23 +1,17 @@
-/* ============================================================
-   docs.js - Wiki 子系统
-   功能：DocsList 加载、侧边栏渲染、上下页分页、文章详情页初始化、
-         Markdown 正文渲染
-   依赖：common.js（Utils / root）
-   加载页面：/docs/index.html、/docs/article
-   ============================================================ */
-
 (function (global) {
   "use strict";
 
   var utils = global.Utils;
-  var root = global.root;
 
-  var DOCS_BASE = "/posts";
-  var DOCS_LIST_URL = "/pages/list.json";
+  /* ---------- 常量 ---------- */
+  var DOCS_BASE       = "/posts";          // markdown 资源根目录
+  var DOCS_LIST_URL   = "/pages/list.json"; // 目录数据
+  var ARTICLE_PAGE_URL = "/app/docs/article";  // 文章模板页
+  var INDEX_PAGE_URL  = "/app/docs";           // 目录首页
   var docsListCache = null;
 
   /* ---------- SEO 元数据（OG / Twitter Card / canonical / JSON-LD） ----------
-     文章页正文由 JS 运行时渲染，初始 <head> 仅有占位 meta；
+     文章页正文由 JS 运行时渲染，初始  仅有占位 meta；
      此处根据当前文章的标题 / 正文 / URL 动态补全社交分享与结构化数据，
      Googlebot 等支持 JS 的爬虫可在执行后抓到完整元信息。 */
   var SITE_ORIGIN = "https://nimbulux.github.io";
@@ -52,7 +46,7 @@
   }
 
   function setArticleMeta(opt) {
-    /* titlePath：从根到叶的标题数组，如 ["Github Pages 部署流程","github","概述"]；
+    /* titlePath：从根到叶的标题数组，如 ["火车在铁轨上晃","001-中奖概率倍高","lan的小说","小说"]；
        fullTitle 反向拼接，headline 取最末一级 */
     var titlePath = opt.titlePath && opt.titlePath.length ? opt.titlePath : [opt.title || ""];
     var headline = titlePath[titlePath.length - 1];
@@ -95,6 +89,7 @@
     return text;
   }
 
+  /* ---------- 数据加载 ---------- */
   function fetchDocsList() {
     if (docsListCache) return Promise.resolve(docsListCache);
     return utils.fetchJSON(DOCS_LIST_URL).then(function (list) {
@@ -108,98 +103,104 @@
   }
   global.fetchDocsList = fetchDocsList;
 
-  /* 侧边栏折叠图标 */
-  var SIDEBAR_TOGGLE_SVG = '<svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M4 2L10 6L4 10Z"/></svg>';
-
-  function isPrefix(short, long) {
-    if (!long || short.length > long.length) return false;
-    for (var i = 0; i < short.length; i++) if (short[i] !== long[i]) return false;
-    return true;
-  }
-  function idsEqual(a, b) {
-    if (!a || !b || a.length !== b.length) return false;
-    for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
-    return true;
+  /* ---------- 节点工具函数 ---------- */
+  /* 节点显示标题：优先 info.title，回退 name */
+  function nodeTitle(node) {
+    return (node && node.info && node.info.title) || (node && node.name) || "";
   }
 
-  /* 文章详情页链接：ids 为 id 路径数组，如 ["deploy","github","overview"]
-      → /docs/article?id=deploy&sub=github&sub2=overview
-     单层 ["vue-guide"] → ?id=vue-guide；两层 ["deploy","overview"] → ?id=deploy&sub=overview */
-  function docHref(ids) {
-     var base = DOCS_BASE + "article?id=" + encodeURIComponent(ids[0]);
-    if (ids[1]) base += "&sub=" + encodeURIComponent(ids[1]);
-    if (ids[2]) base += "&sub2=" + encodeURIComponent(ids[2]);
-    return base;
+  /* 节点唯一路径：relative_path（回退 name） */
+  function nodePath(node) {
+    return (node && (node.relative_path || node.name)) || "";
+  }
+
+  /* 是否含子节点（目录 / 混合节点） */
+  function hasChildren(node) {
+    return !!(node && node.children && node.children.length);
+  }
+
+  /* 路径分段编码（保留 / 作为分隔符） */
+  function encodePath(p) {
+    return String(p).split("/").filter(Boolean).map(encodeURIComponent).join("/");
+  }
+
+  /* 文章详情页链接：/docs/article?path=测试文章/代码高亮测试 */
+  function docHref(relativePath) {
+    return ARTICLE_PAGE_URL + "?path=" + encodePath(relativePath);
   }
   global.docHref = docHref;
 
-  /* 沿 id 路径查找节点；返回该层节点或 null */
-  function findNodeByPath(list, idPath) {
-    var nodes = list;
-    var node = null;
-    for (var i = 0; i < idPath.length; i++) {
-      node = (nodes || []).filter(function (n) { return n.id === idPath[i]; })[0];
-      if (!node) return null;
-      nodes = node.children;
-    }
-    return node;
-  }
+  /* 沿 relative_path 查找节点，返回 { node, titles[], paths[] } 或 null
+     - titles：从根到该节点的标题数组
+     - paths： 从根到该节点的 relative_path 数组 */
+  function findNodeInfo(list, relPath) {
+    var parts = String(relPath || "").split("/").filter(Boolean);
+    if (!parts.length) return null;
 
-  /* 沿 id 路径收集标题数组；路径无效返回 null */
-  function findTitlePath(list, idPath) {
     var nodes = list;
+    var acc = "";
     var titles = [];
-    for (var i = 0; i < idPath.length; i++) {
-      var node = (nodes || []).filter(function (n) { return n.id === idPath[i]; })[0];
+    var paths = [];
+    var node = null;
+
+    for (var i = 0; i < parts.length; i++) {
+      acc = acc ? acc + "/" + parts[i] : parts[i];
+      node = null;
+      var pool = nodes || [];
+      for (var j = 0; j < pool.length; j++) {
+        var cand = pool[j];
+        if (nodePath(cand) === acc || cand.name === parts[i]) { node = cand; break; }
+      }
       if (!node) return null;
-      titles.push(node.title);
+      titles.push(nodeTitle(node));
+      paths.push(nodePath(node) || acc);
       nodes = node.children;
     }
-    return titles;
+    return { node: node, titles: titles, paths: paths };
   }
+  global.findNodeInfo = findNodeInfo;
 
-  /* 从 node 沿第一个 child 递归到叶子，返回完整 id 路径；
-     parentIds 为 node 的父路径（不含 node.id） */
-  function firstLeafIds(node, parentIds) {
-    var ids = parentIds.concat(node.id);
-    if (node.children && node.children.length) {
-      return firstLeafIds(node.children[0], ids);
-    }
-    return ids;
+  /* 从 node 沿第一个 child 递归到叶子，返回叶子的 relative_path */
+  function firstLeafPath(node) {
+    var cur = node;
+    var guard = 0;
+    while (hasChildren(cur) && guard++ < 64) cur = cur.children[0];
+    return nodePath(cur);
   }
-  global.firstLeafIds = firstLeafIds;
+  global.firstLeafPath = firstLeafPath;
 
   /* 将 DocsList 递归展平为叶子分页序列：
-     每个叶子 → { ids: [...], titles: [...] }，均为从根到叶的路径
+     每个叶子 → { path, titles: [...] }，titles 为从根到叶的标题路径
      有 children 的非叶子节点不进入序列（点击会重定向到其第一个叶子） */
   function flattenDocsSequence(list) {
     var seq = [];
-    function walk(nodes, parentIds, parentTitles) {
+    (function walk(nodes, titles) {
       (nodes || []).forEach(function (n) {
-        var ids = parentIds.concat(n.id);
-        var titles = parentTitles.concat(n.title);
-        if (n.children && n.children.length) {
-          walk(n.children, ids, titles);
-        } else {
-          seq.push({ ids: ids, titles: titles });
-        }
+        var t = titles.concat(nodeTitle(n));
+        if (hasChildren(n)) walk(n.children, t);
+        else seq.push({ path: nodePath(n), titles: t });
       });
-    }
-    walk(list, [], []);
+    })(list, []);
     return seq;
   }
+  global.flattenDocsSequence = flattenDocsSequence;
 
-  /* 渲染左侧目录侧边栏；currentPath 为当前文章完整 id 路径（目录页传 null）
+  /* ---------- 侧边栏 ---------- */
+  /* 侧边栏折叠图标 */
+  var SIDEBAR_TOGGLE_SVG = '<svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M4 2L10 6L4 10Z"/></svg>';
+
+  /* 渲染左侧目录侧边栏；currentPath 为当前文章 relative_path（目录页传 null）
      有 children 的节点渲染为折叠组，在当前路径上的组默认展开，其余折叠 */
   function renderSidebar(currentPath) {
     var holder = document.getElementById("docs-sidebar");
     if (!holder) return Promise.resolve();
     return fetchDocsList().then(function (list) {
       var html = "<h3>目录</h3>";
-      list.forEach(function (it) {
-        html += renderSidebarNode(it, [], currentPath);
+      (list || []).forEach(function (it) {
+        html += renderSidebarNode(it, 0, currentPath);
       });
       holder.innerHTML = html;
+
       /* 折叠/展开：点整行或键盘 Enter/Space 切换 */
       if (!holder.__sidebarToggleBound) {
         var toggleGroup = function (group) {
@@ -229,41 +230,42 @@
 
   /* 递归渲染侧边栏节点：
      node        当前节点
-     parentIds   父路径 id 数组（不含 node.id）
-     currentPath 当前文章完整 id 路径（目录页传 null）
+     depth       当前层级（从 0 开始）
+     currentPath 当前文章 relative_path（目录页传 null）
      有 children → 折叠组（在当前路径上展开），内部递归渲染 children
      无 children → 叶子链接 */
-  function renderSidebarNode(node, parentIds, currentPath) {
-    var ids = parentIds.concat(node.id);
-    var depth = parentIds.length;
-    if (node.children && node.children.length) {
-      var onPath = isPrefix(ids, currentPath);
+  function renderSidebarNode(node, depth, currentPath) {
+    var path = nodePath(node);
+    var title = utils.escapeHTML(nodeTitle(node));
+
+    if (hasChildren(node)) {
+      /* 当前路径是否经过该组（自身或其后代） */
+      var onPath = !!currentPath && (currentPath === path || currentPath.indexOf(path + "/") === 0);
       var collapsed = onPath ? "" : " collapsed";
       var expanded = onPath ? "true" : "false";
       var groupActive = onPath ? " sidebar-group-active" : "";
       var html = '<div class="sidebar-group sidebar-depth-' + depth + groupActive + collapsed + '">' +
         '<div class="sidebar-group-header" role="button" tabindex="0" aria-expanded="' + expanded + '">' +
-          '<span class="sidebar-group-title">' + utils.escapeHTML(node.title) + "</span>" +
+          '<span class="sidebar-group-title">' + title + "</span>" +
           '<span class="sidebar-toggle" aria-hidden="true">' + SIDEBAR_TOGGLE_SVG + "</span>" +
         "</div>" +
         '<div class="sidebar-sub">';
       node.children.forEach(function (c) {
-        html += renderSidebarNode(c, ids, currentPath);
+        html += renderSidebarNode(c, depth + 1, currentPath);
       });
       html += "</div></div>";
       return html;
-    } else {
-      var href = docHref(ids);
-      var cls = "sidebar-link sidebar-depth-" + depth;
-      if (idsEqual(ids, currentPath)) cls += " active";
-      return '<a class="' + cls + '" href="' + href + '">' +
-        utils.escapeHTML(node.title) + "</a>";
     }
+
+    var cls = "sidebar-link sidebar-depth-" + depth;
+    if (currentPath === path) cls += " active";
+    return '<a class="' + cls + '" href="' + docHref(path) + '">' + title + "</a>";
   }
 
+  /* ---------- 上下页分页 ---------- */
   /* 渲染上一页/下一页按钮到 #pagination
-     将 DocsList 递归展平为叶子序列，按当前文章 id 路径定位前后；
-     跨章节连续分页（三层亦然）。 */
+     将 DocsList 递归展平为叶子序列，按当前文章 relative_path 定位前后；
+     跨章节连续分页（任意层级亦然）。 */
   function renderPagination(currentPath) {
     var holder = document.getElementById("pagination");
     if (!holder) return Promise.resolve();
@@ -271,15 +273,15 @@
       var seq = flattenDocsSequence(list);
       var idx = -1;
       for (var i = 0; i < seq.length; i++) {
-        if (idsEqual(seq[i].ids, currentPath)) { idx = i; break; }
+        if (seq[i].path === currentPath) { idx = i; break; }
       }
       if (idx === -1) { holder.innerHTML = ""; return; }
 
       var prev = idx > 0 ? seq[idx - 1] : null;
       var next = idx < seq.length - 1 ? seq[idx + 1] : null;
 
-      function btnHTML(node, type) {
-        if (!node) {
+      function btnHTML(item, type) {
+        if (!item) {
           var label = type === "prev" ? "已是第一篇" : "已是最后一篇";
           return '<div class="page-btn ' + type + ' disabled">' +
             '<span class="label">' + label + "</span>" +
@@ -287,8 +289,8 @@
         }
         var arrow = type === "prev" ? "← " : " →";
         var labelText = type === "prev" ? "上一页" : "下一页";
-        var href = docHref(node.ids);
-        var display = node.titles.join(" · ");
+        var href = docHref(item.path);
+        var display = item.titles.join(" · ");
         return '<a class="page-btn ' + type + '" href="' + href + '">' +
           '<span class="label">' + labelText + "</span>" +
           '<span class="title">' + arrow + utils.escapeHTML(display) + "</span></a>";
@@ -302,42 +304,39 @@
   }
   global.renderPagination = renderPagination;
 
-  /* 文章模板页初始化：按 ?id=[&sub][&sub2] 渲染标题、面包屑、正文、侧边栏 + 分页
-     URL 层级：  单层 ?id=a          → docs/a/index.md
-                两层 ?id=a&sub=b    → docs/a/b/index.md
-                三层 ?id=a&sub=b&sub2=c → docs/a/b/c/index.md
+  /* ---------- 文章模板页初始化 ---------- */
+  /* 按 ?path=<relative_path> 渲染标题、面包屑、正文、侧边栏 + 分页
+     markdown 路径：/posts/<relative_path>/index.md
      - 路径指向非叶子（有 children）→ 重定向到其第一个叶子
      - 路径无效 → 回目录页 */
   function initArticlePage() {
     var query = new URLSearchParams(window.location.search);
-    var id = query.get("id") || "";
-    var sub = query.get("sub") || "";
-    var sub2 = query.get("sub2") || "";
-    if (!id) {
-      window.location.replace(DOCS_BASE);
+    var path = (query.get("path") || "").trim();
+    if (!path) {
+      window.location.replace(INDEX_PAGE_URL);
       return;
     }
-    var idPath = [id];
-    if (sub) idPath.push(sub);
-    if (sub2) idPath.push(sub2);
 
     return fetchDocsList().then(function (list) {
-      var node = findNodeByPath(list, idPath);
-      if (!node) {
-        window.location.replace(DOCS_BASE);
+      var info = findNodeInfo(list, path);
+      if (!info) {
+        window.location.replace(INDEX_PAGE_URL);
         return;
       }
+
+      var node = info.node;
       /* 非叶子 → 重定向到第一个叶子 */
-      if (node.children && node.children.length) {
-        window.location.replace(docHref(firstLeafIds(node, idPath.slice(0, -1))));
+      if (hasChildren(node)) {
+        window.location.replace(docHref(firstLeafPath(node)));
         return;
       }
 
       /* 叶子文章 → 渲染 */
-      var titlePath = findTitlePath(list, idPath) || [id];
+      var titlePath = info.titles.length ? info.titles : [node.name || ""];
       var title = titlePath[titlePath.length - 1];
-      var mdUrl = DOCS_BASE + idPath.join("/") + "/index.md";
-      var articleUrl = SITE_ORIGIN + docHref(idPath);
+      var relPath = nodePath(node) || path;
+      var mdUrl = DOCS_BASE + "/" + relPath + "/index.md";
+      var articleUrl = SITE_ORIGIN + docHref(relPath);
 
       setArticleMeta({
         titlePath: titlePath,
@@ -351,11 +350,11 @@
       /* 面包屑：沿层级路径渲染，前 N-1 级为链接（点击跳该层第一个叶子），末级为当前 */
       var breadcrumb = document.getElementById("doc-breadcrumb");
       if (breadcrumb) {
-        if (idPath.length > 1) {
+        if (info.paths.length > 1) {
           var bcHTML = "";
-          for (var i = 0; i < idPath.length - 1; i++) {
-            bcHTML += '<a href="' + docHref(idPath.slice(0, i + 1)) + '">' +
-              utils.escapeHTML(titlePath[i]) + "</a>" +
+          for (var i = 0; i < info.paths.length - 1; i++) {
+            bcHTML += '<a href="' + docHref(info.paths[i]) + '">' +
+              utils.escapeHTML(info.titles[i]) + "</a>" +
               '<span class="breadcrumb-sep">/</span>';
           }
           bcHTML += '<span class="breadcrumb-current">' + utils.escapeHTML(title) + "</span>";
@@ -382,8 +381,8 @@
             } catch (e) {}
           }
         }),
-        renderSidebar(idPath),
-        renderPagination(idPath)
+        renderSidebar(relPath),
+        renderPagination(relPath)
       ]);
     });
   }
@@ -435,9 +434,9 @@
   }
 
   /* ---------- Markdown 正文渲染 ----------
-      selector: 正文容器选择器
-      mdUrl:    markdown 文件 URL（相对路径即可，如 ./index.md）
-    ---------- */
+     selector: 正文容器选择器
+     mdUrl:    markdown 文件 URL（相对路径即可，如 ./index.md）
+     ---------- */
 
   /* 从 HTTP Last-Modified 头解析并填充最后更新日期 */
   function fillDocUpdated(lastModified) {
