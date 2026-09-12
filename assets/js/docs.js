@@ -12,17 +12,17 @@
   var utils = global.Utils;
   var root = global.root;
 
-  var DOCS_BASE = root() + "docs/";
-  var DOCS_LIST_URL = DOCS_BASE + "DocsList.json";
+  var DOCS_BASE = "/posts";
+  var DOCS_LIST_URL = "/pages/list.json";
   var docsListCache = null;
 
   /* ---------- SEO 元数据（OG / Twitter Card / canonical / JSON-LD） ----------
      文章页正文由 JS 运行时渲染，初始 <head> 仅有占位 meta；
      此处根据当前文章的标题 / 正文 / URL 动态补全社交分享与结构化数据，
      Googlebot 等支持 JS 的爬虫可在执行后抓到完整元信息。 */
-  var SITE_ORIGIN = "https://xiao-blog.top";
-  var SITE_AUTHOR = "ckckh2023";
-  var SITE_AVATAR = "https://xiao-blog.top/assets/icons/head.jpg";
+  var SITE_ORIGIN = "https://nimbulux.github.io";
+  var SITE_AUTHOR = "Nimbulux_";
+  var SITE_AVATAR = "https://nimbulux.github.io/public/favicon.jpg";
 
   function setMetaAttr(selector, attr, value) {
     var el = document.head.querySelector(selector);
@@ -56,7 +56,7 @@
        fullTitle 反向拼接，headline 取最末一级 */
     var titlePath = opt.titlePath && opt.titlePath.length ? opt.titlePath : [opt.title || ""];
     var headline = titlePath[titlePath.length - 1];
-    var fullTitle = titlePath.slice().reverse().join(" - ") + " - ckckh2023 文档";
+    var fullTitle = titlePath.slice().reverse().join(" - ") + " - 云中霞光";
     document.title = fullTitle;
     upsertMeta("description", opt.description);
 
@@ -101,7 +101,7 @@
       docsListCache = list || [];
       return docsListCache;
     }).catch(function (err) {
-      console.warn("[docs] DocsList.json 加载失败：", err);
+      console.warn("[docs] list.json 加载失败：", err);
       docsListCache = [];
       return docsListCache;
     });

@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  var SITE_BIRTH = new Date("2026-08-13T00:00:00+08:00").getTime();
+  var SITE_BIRTH = new Date("2026-07-12T02:46:25+08:00").getTime();
 
   /* 递归收集所有文档节点的 id 路径 */
   function walkDocs(list, ids, nodes) {
@@ -14,10 +14,10 @@
   }
 
   function docMdPath(ids) {
-    return "/docs/" + ids.map(encodeURIComponent).join("/") + "/index.md";
+    return "/posts" + ids.map(encodeURIComponent).join("/") + "/page.md";
   }
 
-  /* 仅统计实际存在 index.md 的文档（HEAD 探测） */
+  /* 仅统计实际存在 page.md 的文档（HEAD 探测） */
   function countExistingDocs(list) {
     var nodes = [];
     walkDocs(list, [], nodes);
