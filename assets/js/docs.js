@@ -306,7 +306,7 @@
 
   /* ---------- 文章模板页初始化 ---------- */
   /* 按 ?path=<relative_path> 渲染标题、面包屑、正文、侧边栏 + 分页
-     markdown 路径：/posts/<relative_path>/index.md
+     markdown 路径：/posts/<relative_path>/page.md
      - 路径指向非叶子（有 children）→ 重定向到其第一个叶子
      - 路径无效 → 回目录页 */
   function initArticlePage() {
@@ -335,12 +335,12 @@
       var titlePath = info.titles.length ? info.titles : [node.name || ""];
       var title = titlePath[titlePath.length - 1];
       var relPath = nodePath(node) || path;
-      var mdUrl = DOCS_BASE + "/" + relPath + "/index.md";
+      var mdUrl = DOCS_BASE + "/" + relPath + "/page.md";
       var articleUrl = SITE_ORIGIN + docHref(relPath);
 
       setArticleMeta({
         titlePath: titlePath,
-        description: "ckckh2023 的文档库文章",
+        description: "Nimbulux_ 的文档库文章",
         url: articleUrl
       });
 
@@ -435,7 +435,7 @@
 
   /* ---------- Markdown 正文渲染 ----------
      selector: 正文容器选择器
-     mdUrl:    markdown 文件 URL（相对路径即可，如 ./index.md）
+     mdUrl:    markdown 文件 URL（相对路径即可，如 ./page.md）
      ---------- */
 
   /* 从 HTTP Last-Modified 头解析并填充最后更新日期 */
