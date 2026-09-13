@@ -13,7 +13,7 @@
 
   /* 好友列表（格式：[{ id, avatar?, bio, url }]，avatar 缺失时以 ID 首字母占位） */
   function fetchFriendList() {
-    return utils.fetchJSON(root() + "friend/FriendList.json").then(function (list) {
+    return utils.fetchJSON(root() + "/friend/FriendList.json").then(function (list) {
       return Array.isArray(list) ? list : [];
     }).catch(function (err) {
       console.warn("[friend] FriendList.json 加载失败：", err);
@@ -46,15 +46,24 @@
       avatarNode = '<div class="fc-avatar-fallback">' + utils.escapeHTML(initial) + "</div>";
     }
 
-    return '<article class="card friend-card">' +
-      '<div class="fc-header">' + avatarNode +
-        '<div class="fc-id">' + utils.escapeHTML(id) + "</div>" +
-      "</div>" +
-      '<div class="fc-bio">' + bio + "</div>" +
-      '<div class="fc-actions">' +
-        '<a class="btn btn-primary" href="' + url + '" target="_blank" rel="noopener">访问主页</a>' +
-      "</div>" +
-    "</article>";
+    if (url) {
+      return '<article class="card friend-card">' +
+        '<div class="fc-header">' + avatarNode +
+          '<div class="fc-id">' + utils.escapeHTML(id) + "</div>" +
+        "</div>" +
+        '<div class="fc-bio">' + bio + "</div>" +
+        '<div class="fc-actions">' +
+          '<a class="btn btn-primary" href="' + url + '" target="_blank" rel="noopener">访问主页</a>' +
+        "</div>" +
+      "</article>";
+    } else {
+      return '<article class="card friend-card">' +
+        '<div class="fc-header">' + avatarNode +
+          '<div class="fc-id">' + utils.escapeHTML(id) + "</div>" +
+        "</div>" +
+        '<div class="fc-bio">' + bio + "</div>" +
+      "</article>";
+    }
   }
 
   function mountFriendGrid(selector, list, perRow) {

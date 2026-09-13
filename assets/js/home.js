@@ -18,12 +18,12 @@
      与仓库卡片（repo.js enrichProject）行为一致：本地数据优先，
      GitHub API 只在可用时后台覆盖更新 */
   var FALLBACK_PROFILE = {
-    name: "Xander Xiao",
-    bio: "没招了没招了没招了",
+    name: "Nimbulux_",
+    bio: "what can i say (((",
     location: "China",
     company: null,
-    followers: 10,
-    public_repos: 7
+    followers: 1,
+    public_repos: 5
   };
 
   /* 本地数据（高优）：直接返回内置 FALLBACK_PROFILE，页面秒开 */
@@ -58,7 +58,7 @@
 
   /* ---------- 精选文档 数据加载 ---------- */
   function fetchStarDocs() {
-    return utils.fetchJSON(root() + "docs/star.json").then(function (list) {
+    return utils.fetchJSON(root() + "/docs/star.json").then(function (list) {
       return Array.isArray(list) ? list : [];
     }).catch(function (err) {
       console.warn("[star] docs/star.json 加载失败：", err);
@@ -67,16 +67,6 @@
   }
   global.fetchStarDocs = fetchStarDocs;
 
-  /* ---------- 精选分享 数据加载 ---------- */
-  function fetchStarShares() {
-    return utils.fetchJSON(root() + "share/star.json").then(function (list) {
-      return Array.isArray(list) ? list : [];
-    }).catch(function (err) {
-      console.warn("[star] share/star.json 加载失败：", err);
-      return [];
-    });
-  }
-  global.fetchStarShares = fetchStarShares;
 
   /* ---------- 精选文档 卡片渲染（纯 DOM） ----------
      selector: 挂载点选择器
@@ -107,49 +97,4 @@
       items.map(wikiCardHTML).join("") + "</div>";
   }
   global.mountWikiCards = mountWikiCards;
-
-  /* ---------- 精选留言数据加载 ----------
-     guestbook/star.json 存放精选留言的 id 数组，例如：[1, 5, 12]
-     渲染时按 id 调 /api/guestbook?ids= 从 D1 数据库批量获取。 */
-  function fetchStarGuestbook() {
-    return utils.fetchJSON(root() + "guestbook/star.json").then(function (list) {
-      return Array.isArray(list) ? list : [];
-    }).catch(function (err) {
-      console.warn("[star] guestbook/star.json 加载失败：", err);
-      return [];
-    });
-  }
-  global.fetchStarGuestbook = fetchStarGuestbook;
-
-  /* 卡片渲染复用 gb-card.js 的 window.GBCard */
-
-  /* 精选留言卡片渲染（纯 DOM）
-     selector: 挂载点选择器
-     list:     star.json 内容（留言 id 数字数组） */
-  function mountGuestbookCards(selector, list) {
-    var box = document.querySelector(selector);
-    if (!box) return;
-    var ids = (list || []).filter(function (n) { return typeof n === "number" && n > 0; });
-    if (!ids.length) {
-      box.innerHTML = '<div class="status-box">暂无精选留言。</div>';
-      return;
-    }
-    box.innerHTML = '<div class="status-box">加载中…</div>';
-    fetch("/api/guestbook?ids=" + ids.join(",")).then(function (res) {
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    }).then(function (data) {
-      var valid = (data && data.list) || [];
-      if (!valid.length) {
-        box.innerHTML = '<div class="status-box">精选留言加载失败，请稍后重试。</div>';
-        return;
-      }
-      box.innerHTML = '<div class="guestbook-wall">' +
-        valid.map(global.GBCard.gbCardHTML).join("") + "</div>";
-      global.GBCard.setupClamp(box);
-    }).catch(function () {
-      box.innerHTML = '<div class="status-box">精选留言加载失败，请稍后重试。</div>';
-    });
-  }
-  global.mountGuestbookCards = mountGuestbookCards;
 })(window);

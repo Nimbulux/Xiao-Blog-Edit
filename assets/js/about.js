@@ -54,15 +54,10 @@
 
   /* 并行拉取各数据源计算统计 */
   Promise.all([
-    fetch("/docs/DocsList.json").then(function (r) { return r.json(); }).catch(function () { return []; }),
-    fetch("/repo/RepoList.json").then(function (r) { return r.json(); }).catch(function () { return []; }),
-    fetch("/share/SoftWareList.json").then(function (r) { return r.json(); }).catch(function () { return []; }),
-    fetch("/share/OtherList.json").then(function (r) { return r.json(); }).catch(function () { return []; }),
-    fetch("/api/guestbook").then(function (r) { return r.json(); }).catch(function () { return { list: [] }; })
+    fetch("/pages/list.json").then(function (r) { return r.json(); }).catch(function () { return []; }),
+    fetch("/app/repo/RepoList.json").then(function (r) { return r.json(); }).catch(function () { return []; }),
   ]).then(function (res) {
     countExistingDocs(res[0]).then(function (n) { setNum("stat-docs", n); });
     setNum("stat-repos", res[1].length);
-    setNum("stat-shares", res[2].length + res[3].length);
-    setNum("stat-guestbook", (res[4] && res[4].list) ? res[4].list.length : 0);
   });
 })(window);

@@ -15,7 +15,7 @@
   var GITHUB_API = "https://api.github.com/users/" + GITHUB_USER;
 
   /* 根路径（用户页站点部署在域名根目录） */
-  function root() { return "/"; }
+  function root() { return "/app/"; }
   global.root = root;
 
   /* ---------- 工具函数 ---------- */
@@ -219,12 +219,13 @@
   initTheme();
 
   /* ---------- 导航栏渲染 ---------- */
+  /* 此处硬编码`match`需要随着root()返回的做调整 */
   var NAV_ITEMS = [
-    { label: "首页", href: root() + "app/", match: /^\/app\/(index\.html)?$/ },
-    { label: "项目", href: root() + "app/repo/", match: /^\/app\/repo\// },
-    { label: "文档", href: root() + "app/docs/", match: /^\/app\/docs\//, more: true },
-    { label: "好友", href: root() + "app/friend/", match: /^\/app\/friend\//, more: true },
-    { label: "关于", href: root() + "app/about/", match: /^\/app\/about\//, more: true }
+    { label: "首页", href: root(), match: /^\/app\/(index\.html)?$/ },
+    { label: "项目", href: root() + "repo/", match: /^\/app\/repo\// },
+    { label: "文档", href: root() + "docs/", match: /^\/app\/docs\//, more: true },
+    { label: "好友", href: root() + "friend/", match: /^\/app\/friend\//, more: true },
+    { label: "关于", href: root() + "about/", match: /^\/app\/about\//, more: true }
   ];
 
   var GITHUB_ICON_SVG =
@@ -397,7 +398,7 @@
     for (var i = 0; i < footers.length; i++) {
       var span = document.createElement("span");
       span.className = "footer-cf-logo";
-      span.innerHTML = GITCODE_ICON_SVG;
+      span.innerHTML = GITHUB_ICON_SVG;
       footers[i].appendChild(span);
     }
   }
