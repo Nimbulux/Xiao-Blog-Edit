@@ -297,22 +297,52 @@
     return '<a class="' + cls + '" href="' + docHref(path) + '">' + title + '</a>';
   }
 
-  /* ---------- 上下页分页 ---------- */
-  /* 序列来源：flattenDocsSequence（article + mixed 节点）。
-     这样混合节点（如「作文」）本身也参与分页，且它自己的正文与子文章连续。 */
+    /* ---------- 上下页分页 ---------- */
+  /* 仅对 type === "article" 的节点显示分页；
+     分页范围限定为同一父节点下的直接 article 子节点；
+     list.json 为倒序（最新在前），因此：
+       - 更早的文章（索引 +1）作为「上一篇」
+       - 更新的文章（索引 -1）作为「下一篇」 */
   function renderPagination(currentPath) {
     var holder = document.getElementById("pagination");
     if (!holder) return Promise.resolve();
     return fetchDocsList().then(function (list) {
-      var seq = flattenDocsSequence(list);
-      var idx = -1;
-      for (var i = 0; i < seq.length; i++) {
-        if (seq[i].path === currentPath) { idx = i; break; }
+      var info = findNodeInfo(list, currentPath);
+      if (!info || info.node.type !== "article") {
+        holder.innerHTML = "";
+        return;
       }
-      if (idx === -1) { holder.innerHTML = ""; return; }
 
-      var prev = idx > 0 ? seq[idx - 1] : null;
-      var next = idx < seq.length - 1 ? seq[idx + 1] : null;
+      var node = info.node;
+      var siblings;
+
+      if (info.paths.length === 1) {
+        // 顶层文章：兄弟为 list 中所有 article
+        siblings = (list || []).filter(function (n) { return n.type === "article"; });
+      } else {
+        // 非顶层：找到父节点，取父节点下直接子 article
+        var parentPath = info.paths.slice(0, -1).join("/");
+        var parentInfo = findNodeInfo(list, parentPath);
+        if (!parentInfo || !parentInfo.node.children) {
+          holder.innerHTML = "";
+          return;
+        }
+        siblings = parentInfo.node.children.filter(function (n) { return n.type === "article"; });
+      }
+
+      // 找到当前文章在兄弟列表中的索引
+      var idx = -1;
+      for (var i = 0; i < siblings.length; i++) {
+        if (nodePath(siblings[i]) === nodePath(node)) { idx = i; break; }
+      }
+      if (idx === -1) {
+        holder.innerHTML = "";
+        return;
+      }
+
+      // 倒序列表：更早在 idx+1，更新在 idx-1
+      var prevNode = siblings[idx + 1] || null;  // 更早 -> 上一篇
+      var nextNode = siblings[idx - 1] || null;  // 更新 -> 下一篇
 
       function btnHTML(item, type) {
         if (!item) {
@@ -323,9 +353,9 @@
                  '</div>';
         }
         var arrow     = type === "prev" ? "← " : " →";
-        var labelText = type === "prev" ? "上一页" : "下一页";
-        var href      = docHref(item.path);
-        var display   = item.titles.join(" · ");
+        var labelText = type === "prev" ? "上一篇" : "下一篇";
+        var href      = docHref(nodePath(item));
+        var display   = nodeTitle(item);
         return '<a class="page-btn ' + type + '" href="' + href + '">' +
                  '<span class="label">' + labelText + '</span>' +
                  '<span class="title">' + arrow + utils.escapeHTML(display) + '</span>' +
@@ -333,9 +363,9 @@
       }
 
       holder.innerHTML =
-        btnHTML(prev, "prev") +
+        btnHTML(prevNode, "prev") +
         '<div class="page-divider"></div>' +
-        btnHTML(next, "next");
+        btnHTML(nextNode, "next");
     });
   }
   global.renderPagination = renderPagination;
@@ -371,7 +401,7 @@
       var titlePath = info.titles.length ? info.titles : [node.name || ""];
       var title     = titlePath[titlePath.length - 1];
       var relPath   = nodePath(node) || path;
-      var mdUrl     = DOCS_BASE + "/" + relPath + "/index.md";
+      var mdUrl     = DOCS_BASE + "/" + relPath + "/page.md";
       var articleUrl = SITE_ORIGIN + docHref(relPath);
 
       setArticleMeta({
