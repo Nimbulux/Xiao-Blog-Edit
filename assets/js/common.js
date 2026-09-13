@@ -9,8 +9,8 @@
   "use strict";
 
   /* ---------- 全局常量 ---------- */
-  var GITHUB_USER = "ckckh2023";
-  var GITHUB_AVATAR = "/assets/icons/head.jpg";
+  var GITHUB_USER = "nimbulux";
+  var GITHUB_AVATAR = "/public/favicon.jpg";
   var GITHUB_HOME = "https://github.com/" + GITHUB_USER;
   var GITHUB_API = "https://api.github.com/users/" + GITHUB_USER;
 

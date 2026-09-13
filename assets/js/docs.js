@@ -6,8 +6,8 @@
   /* ---------- 常量 ---------- */
   var DOCS_BASE        = "/posts";           // markdown 资源根目录
   var DOCS_LIST_URL    = "/pages/list.json"; // 目录数据
-  var ARTICLE_PAGE_URL = "/docs/article";    // 文章模板页
-  var INDEX_PAGE_URL   = "/docs";            // 目录首页
+  var ARTICLE_PAGE_URL = "/app/docs/article";    // 文章模板页
+  var INDEX_PAGE_URL   = "/app/docs";            // 目录首页
   var docsListCache    = null;
 
   /* ---------- SEO 元数据（OG / Twitter Card / canonical / JSON-LD） ---------- */
