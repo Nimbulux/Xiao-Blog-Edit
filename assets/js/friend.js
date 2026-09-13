@@ -46,7 +46,7 @@
       avatarNode = '<div class="fc-avatar-fallback">' + utils.escapeHTML(initial) + "</div>";
     }
 
-    if (url) {
+    if (url != "#") {
       return '<article class="card friend-card">' +
         '<div class="fc-header">' + avatarNode +
           '<div class="fc-id">' + utils.escapeHTML(id) + "</div>" +

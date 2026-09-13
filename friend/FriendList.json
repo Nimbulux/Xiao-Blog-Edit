@@ -13,8 +13,7 @@
   },
   {
 	"id": "lan",
-	"avatar": "https://nimbulux.github.io/public/lan.jpg",
-    "bio": "从初中认识的挚友 很投机",
-    "url": ""
+	"avatar": "/public/lan.jpg",
+    "bio": "从初中认识的挚友 很投机"
   }
 ]
