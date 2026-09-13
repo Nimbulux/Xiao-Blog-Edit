@@ -350,6 +350,7 @@
       } catch (e) {}
     }
   }
+
   global.isPureDirectory    = isPureDirectory;
   global.refreshArticleMeta = refreshArticleMeta;
   global.extractDescription = extractDescription;

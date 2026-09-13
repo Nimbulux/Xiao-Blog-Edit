@@ -54,6 +54,15 @@
     el.textContent = "最后更新：" + d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
   }
 
+  /* 去掉 markdown 里与页面 doc-title 重复的第一个 h1 */
+  function stripFirstH1(box) {
+    var first = box.firstElementChild;
+    while (first && first.nodeType !== 1) first = first.nextElementSibling;
+    if (first && first.tagName === "H1") {
+      first.parentNode.removeChild(first);
+    }
+  }
+
   function renderDocMarkdown(selector, mdUrl) {
     var box = document.querySelector(selector);
     if (!box) return Promise.resolve();
@@ -66,9 +75,11 @@
       if (!r.ok) throw new Error("HTTP " + r.status);
       fillDocUpdated(r.headers.get("Last-Modified"));
       return r.text();
-    }).then(function (md) {
+        }).then(function (md) {
       box.innerHTML = parse(md);
+      stripFirstH1(box);
       enhanceCodeBlocks(box);
+      highlightAll(box);
     }).catch(function (err) {
       console.warn("[doc] markdown 加载失败 " + mdUrl + "：", err);
       box.innerHTML = '<p class="status-box">正文加载失败。</p>';
@@ -238,4 +249,15 @@
     updateActive();
   }
   global.initDocToc = initDocToc;
+
+  /* ---------- 代码高亮 ---------- */
+  function highlightAll(root) {
+    if (!window.hljs) return;
+    var blocks = root.querySelectorAll("pre code");
+    Array.prototype.forEach.call(blocks, function (block) {
+      if (block.classList.contains("hljs")) return;   /* 已高亮过就跳过 */
+      try { window.hljs.highlightElement(block); } catch (e) {}
+    });
+  }
+
 })(window);

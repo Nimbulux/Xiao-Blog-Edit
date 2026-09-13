@@ -53,7 +53,7 @@ License: Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 Internatio
 assets/vendor/ 下的第三方库遵循其各自原始协议：
   - Vue 3 (vue.global.js): MIT License — <https://vuejs.org>
   - marked (marked.min.js): MIT License — <https://marked.js.org>
-  - DOMPurify (CDN 引入): MPL 2.0 / Apache 2.0 双协议 — <https://github.com/cure53/DOMPurify>
+  - highlightjs (highlight.min.js): BSD-3-Clause - <https://highlightjs.org/>
 
 ================================================================================
 4. 免责声明
