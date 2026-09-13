@@ -54,7 +54,7 @@
   </footer>
 
   <script src="/app/assets/js/common.js"></script>
-  <script src="/app/assets/js/docs.js"></script>
+  <script src="/app/assets/js/docs-core.js"></script>
   <script>
     /* 渲染左侧侧边栏（目录页无当前文章） */
     renderSidebar(null);
@@ -65,7 +65,7 @@
 
     function matchDoc(item, q) {
       if (!q) return true;
-      var fields = [item.title, item.id];
+      var fields = [nodeTitle(item), nodePath(item)];   // ← 用 nodeTitle/nodePath
       for (var i = 0; i < fields.length; i++) {
         if (fields[i] && String(fields[i]).toLowerCase().indexOf(q) !== -1) return true;
       }
@@ -80,11 +80,13 @@
         return;
       }
       box.innerHTML = list.map(function (item) {
+        var relPath = nodePath(item);                       // ← 用 core 暴露的工具
         var href = (item.children && item.children.length)
-          ? docHref(firstLeafIds(item, []))
-          : docHref([item.id]);
+          ? docHref(firstLeafPath(item))                    // ← 直接拿叶子路径
+          : docHref(relPath);
+
         return '<a class="doc-item" href="' + href + '">' +
-          '<span class="doc-title">' + Utils.escapeHTML(item.title) + "</span>" +
+          '<span class="doc-title">' + Utils.escapeHTML(nodeTitle(item)) + "</span>" +
           '<span class="doc-arrow">→</span>' +
         "</a>";
       }).join("");

@@ -382,6 +382,103 @@
 .doc-body table a { color: var(--link); }
 .doc-body table a:hover { color: var(--link-hover); }
 
+/* ---------- 阅读进度目录（TOC） ---------- */
+.docs-toc {
+  width: 240px;
+  flex-shrink: 0;
+  padding: 32px 12px 64px 0;
+  position: sticky;
+  top: 56px;
+  align-self: flex-start;
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.2s ease;
+}
+.docs-toc:hover { scrollbar-color: var(--border) transparent; }
+.docs-toc::-webkit-scrollbar { width: 6px; }
+.docs-toc::-webkit-scrollbar-track { background: transparent; }
+.docs-toc::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+.docs-toc:hover::-webkit-scrollbar-thumb { background: var(--border); }
+
+.docs-toc .toc-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 0 8px 10px 8px;
+}
+
+.docs-toc .toc-nav {
+  display: block;
+  border-left: 2px solid var(--border);
+}
+.docs-toc .toc-group { display: block; }
+.docs-toc .toc-children {
+  display: block;
+  overflow: hidden;
+}
+.docs-toc .toc-group.collapsed > .toc-children { display: none; }
+
+.docs-toc .toc-item {
+  display: block;
+  padding: 6px 12px 6px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  border-left: 2px solid transparent;
+  margin-left: -2px;                 /* 抵消 .toc-nav 的左边框，使高亮条与其对齐 */
+  border-radius: 0 6px 6px 0;
+  transition: color 0.15s ease, background 0.15s ease,
+              border-color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.docs-toc .toc-item:hover {
+  color: var(--link);
+  background: var(--active-bg);
+}
+
+/* 「框选」：高亮当前阅读位置 */
+.docs-toc .toc-item.active {
+  color: var(--link);
+  font-weight: 600;
+  background: var(--active-bg);
+  border-left-color: var(--link);
+  box-shadow: inset 0 0 0 1px var(--active-border);
+}
+
+/* 层级缩进 + 字号微调 */
+.docs-toc .toc-item.toc-h1 { padding-left: 12px; font-weight: 600; font-size: 13.5px; }
+.docs-toc .toc-item.toc-h2 { padding-left: 24px; }
+.docs-toc .toc-item.toc-h3 { padding-left: 36px; font-size: 12.5px; }
+.docs-toc .toc-item.toc-h4 { padding-left: 48px; font-size: 12.5px; }
+.docs-toc .toc-item.toc-h5 { padding-left: 60px; font-size: 12px; }
+.docs-toc .toc-item.toc-h6 { padding-left: 72px; font-size: 12px; }
+
+/* 锚点被 sticky 顶栏遮挡的补偿 */
+.doc-body h1,
+.doc-body h2,
+.doc-body h3,
+.doc-body h4,
+.doc-body h5,
+.doc-body h6 {
+  scroll-margin-top: 72px;
+}
+
+/* 响应式：屏幕较窄时隐藏右侧 TOC，避免挤压正文 */
+@media (max-width: 1100px) {
+  .docs-toc { display: none; }
+}
+
 /* ============================================================
    代码高亮（highlight.js 类名）
    依赖：highlight.js；颜色变量请按你的主题选择器调整

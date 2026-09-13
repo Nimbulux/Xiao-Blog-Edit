@@ -1,13 +1,11 @@
 (function (global) {
   "use strict";
-
   var utils = global.Utils;
 
   /* ---------- 常量 ---------- */
   var DOCS_BASE        = "/posts";
   var DOCS_LIST_URL    = "/pages/list.json";
   var ARTICLE_PAGE_URL = "/app/docs/article";
-  var INDEX_PAGE_URL   = "/app/docs";
   var docsListCache    = null;
 
   /* ---------- SEO ---------- */
@@ -17,8 +15,7 @@
 
   function setMetaAttr(selector, attr, value) {
     var el = document.head.querySelector(selector);
-    if (!el) return;
-    el.setAttribute(attr, value);
+    if (el) el.setAttribute(attr, value);
   }
   function upsertMeta(name, content) {
     var el = document.head.querySelector('meta[name="' + name + '"]');
@@ -40,16 +37,16 @@
     el.textContent = JSON.stringify(obj);
   }
   function setArticleMeta(opt) {
-    var titlePath = opt.titlePath && opt.titlePath.length ? opt.titlePath : [opt.title || ""];
+    var titlePath = (opt.titlePath && opt.titlePath.length) ? opt.titlePath : [opt.title || ""];
     var headline  = titlePath[titlePath.length - 1];
     var fullTitle = titlePath.slice().reverse().join(" - ") + " - 云中霞光";
     document.title = fullTitle;
     upsertMeta("description", opt.description);
 
-    setMetaAttr('meta[property="og:title"]',       "content", fullTitle);
-    setMetaAttr('meta[property="og:description"]', "content", opt.description);
-    setMetaAttr('meta[property="og:url"]',         "content", opt.url);
-    setMetaAttr('meta[property="og:image"]',       "content", opt.image || SITE_AVATAR);
+    setMetaAttr('meta[property="og:title"]',        "content", fullTitle);
+    setMetaAttr('meta[property="og:description"]',  "content", opt.description);
+    setMetaAttr('meta[property="og:url"]',          "content", opt.url);
+    setMetaAttr('meta[property="og:image"]',        "content", opt.image || SITE_AVATAR);
     setMetaAttr('meta[name="twitter:title"]',       "content", fullTitle);
     setMetaAttr('meta[name="twitter:description"]', "content", opt.description);
     setMetaAttr('meta[name="twitter:image"]',       "content", opt.image || SITE_AVATAR);
@@ -69,7 +66,6 @@
       "mainEntityOfPage": { "@type": "WebPage", "@id": opt.url }
     });
   }
-
   function extractDescription(box) {
     if (!box) return "";
     var p = box.querySelector("p");
@@ -112,16 +108,17 @@
   function isPureDirectory(node) {
     return hasChildren(node) && !isArticleNode(node);
   }
+  function isArticleTypeNode(node) {
+    return !!node && node.type === "article";
+  }
 
-  /* 对外暴露，便于主页脚本使用 */
-  global.nodeTitle  = nodeTitle;
-  global.nodePath   = nodePath;
+  global.nodeTitle   = nodeTitle;
+  global.nodePath    = nodePath;
   global.hasChildren = hasChildren;
 
   function encodePath(p) {
     return String(p).split("/").filter(Boolean).map(encodeURIComponent).join("/");
   }
-
   function docHref(pathOrIds) {
     var path = Array.isArray(pathOrIds)
       ? pathOrIds.join("/")
@@ -130,6 +127,8 @@
   }
   global.docHref = docHref;
 
+  /* 查找节点：返回 { node, titles, paths }，
+     paths 里存的是「每一层的完整路径」 */
   function findNodeInfo(list, relPath) {
     var parts = String(relPath || "").split("/").filter(Boolean);
     if (!parts.length) return null;
@@ -163,27 +162,6 @@
   }
   global.firstLeafPath = firstLeafPath;
 
-  /* 兼容旧接口：返回路径分段数组 */
-  function firstLeafIds(node) {
-    var p = firstLeafPath(node);
-    return p ? p.split("/").filter(Boolean) : [];
-  }
-  global.firstLeafIds = firstLeafIds;
-
-  /* 扁平化（主页/搜索等可用；分页不再使用） */
-  function flattenDocsSequence(list) {
-    var seq = [];
-    (function walk(nodes, titles) {
-      (nodes || []).forEach(function (n) {
-        var t = titles.concat(nodeTitle(n));
-        if (isArticleNode(n)) seq.push({ path: nodePath(n), titles: t });
-        if (hasChildren(n)) walk(n.children, t);
-      });
-    })(list, []);
-    return seq;
-  }
-  global.flattenDocsSequence = flattenDocsSequence;
-
   /* ---------- 侧边栏 ---------- */
   var SIDEBAR_TOGGLE_SVG = '<svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M4 2L10 6L4 10Z"/></svg>';
 
@@ -203,7 +181,6 @@
           var header = group.querySelector(".sidebar-group-header");
           if (header) header.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
         };
-
         holder.addEventListener("click", function (e) {
           var toggle = e.target.closest(".sidebar-toggle");
           if (toggle) {
@@ -218,7 +195,6 @@
           var g2 = header.closest(".sidebar-group");
           if (g2) toggleGroup(g2);
         });
-
         holder.addEventListener("keydown", function (e) {
           if (e.key !== "Enter" && e.key !== " ") return;
           var header = e.target.closest(".sidebar-group-header");
@@ -228,7 +204,6 @@
           var group = header.closest(".sidebar-group");
           if (group) toggleGroup(group);
         });
-
         holder.__sidebarToggleBound = true;
       }
     });
@@ -236,8 +211,8 @@
   global.renderSidebar = renderSidebar;
 
   function renderSidebarNode(node, depth, currentPath) {
-    var path  = nodePath(node);
-    var title = utils.escapeHTML(nodeTitle(node));
+    var path    = nodePath(node);
+    var title   = utils.escapeHTML(nodeTitle(node));
     var isMixed = node.type === "mixed";
 
     if (hasChildren(node)) {
@@ -272,45 +247,43 @@
     return '<a class="' + cls + '" href="' + docHref(path) + '">' + title + '</a>';
   }
 
-  /* ---------- 分页（核心修改） ---------- */
+  /* ---------- 分页 ---------- */
   /* 收集「兄弟文章池」：从当前文章的父层开始向上回溯，
      找到第一个满足以下条件的池：
-       1. 该池中包含当前文章（按 relative_path 匹配）
+       1. 池中包含当前文章（按 relative_path 匹配）
        2. 池内至少有一篇 type === "article" 的文章
-     返回该池中所有 type === "article" 的节点，保持 list 原顺序。 */
+     ★ 关键修正：info.paths[i] 本身就是「到第 i 层的完整路径」，
+       不能再对它 join("/")，否则路径会重复。 */
   function collectSiblingArticles(list, info) {
-    var currentPath = info.paths[info.paths.length - 1];
+    var paths = (info && info.paths) || [];
+    var currentPath = paths[paths.length - 1];
+    if (!currentPath) return [];
 
-    for (var depth = info.paths.length - 1; depth >= 0; depth--) {
-      var ancestorPath = depth === 0 ? "" : info.paths.slice(0, depth).join("/");
-      var pool;
+    /* 从直接父级（paths.length - 2）一路向上找 */
+    for (var i = paths.length - 2; i >= 0; i--) {
+      var anc = findNodeInfo(list, paths[i]);
+      if (!anc || !anc.node || !anc.node.children) continue;
 
-      if (depth === 0) {
-        pool = list;
-      } else {
-        var ancInfo = findNodeInfo(list, ancestorPath);
-        if (!ancInfo || !ancInfo.node.children) continue;
-        pool = ancInfo.node.children;
+      var articles = anc.node.children.filter(isArticleTypeNode);
+      if (!articles.length) continue;
+
+      for (var k = 0; k < articles.length; k++) {
+        if (nodePath(articles[k]) === currentPath) return articles;
       }
+    }
 
-      var articles = (pool || []).filter(function (n) {
-        return n.type === "article";
-      });
-
-      var containsCurrent = articles.some(function (a) {
-        return nodePath(a) === currentPath;
-      });
-
-      if (containsCurrent && articles.length >= 1) {
-        return articles;
-      }
+    /* 兜底：当前文章就在根列表里 */
+    var rootArticles = (list || []).filter(isArticleTypeNode);
+    for (var m = 0; m < rootArticles.length; m++) {
+      if (nodePath(rootArticles[m]) === currentPath) return rootArticles;
     }
     return [];
   }
 
   /* 仅对 type === "article" 显示分页。
-     list.json 为倒序（最新在前）：idx + 1 = 更早 = 上一篇；
-                                    idx - 1 = 更新 = 下一篇。 */
+     list.json 为倒序（最新在前）：
+       idx + 1 = 更早 = 上一篇
+       idx - 1 = 更新 = 下一篇 */
   function renderPagination(currentPath) {
     var holder = document.getElementById("pagination");
     if (!holder) return Promise.resolve();
@@ -333,7 +306,6 @@
         return;
       }
 
-      /* 倒序：更早（idx+1）作为上一篇，更新（idx-1）作为下一篇 */
       var prevNode = siblings[idx + 1] || null;
       var nextNode = siblings[idx - 1] || null;
 
@@ -363,156 +335,28 @@
   }
   global.renderPagination = renderPagination;
 
-  /* ---------- 文章模板页 ---------- */
-  function initArticlePage() {
-    var query = new URLSearchParams(window.location.search);
-    var path  = (query.get("path") || "").trim();
-    if (!path) {
-      window.location.replace(INDEX_PAGE_URL);
-      return;
+  /* 正文出来后再刷新 description（og / twitter / JSON-LD 一起改） */
+  function refreshArticleMeta(desc) {
+    if (!desc) return;
+    upsertMeta("description", desc);
+    setMetaAttr('meta[property="og:description"]',  "content", desc);
+    setMetaAttr('meta[name="twitter:description"]', "content", desc);
+    var ld = document.head.querySelector('script[type="application/ld+json"][data-seo="article"]');
+    if (ld) {
+      try {
+        var obj = JSON.parse(ld.textContent);
+        obj.description = desc;
+        ld.textContent = JSON.stringify(obj);
+      } catch (e) {}
     }
-
-    return fetchDocsList().then(function (list) {
-      var info = findNodeInfo(list, path);
-      if (!info) {
-        window.location.replace(INDEX_PAGE_URL);
-        return;
-      }
-
-      var node = info.node;
-
-      if (isPureDirectory(node)) {
-        window.location.replace(docHref(firstLeafPath(node)));
-        return;
-      }
-
-      var titlePath = info.titles.length ? info.titles : [node.name || ""];
-      var title     = titlePath[titlePath.length - 1];
-      var relPath   = nodePath(node) || path;
-      /* ★ Markdown 文件改为 page.md */
-      var mdUrl     = DOCS_BASE + "/" + relPath + "/page.md";
-      var articleUrl = SITE_ORIGIN + docHref(relPath);
-
-      setArticleMeta({
-        titlePath: titlePath,
-        description: "Nimbulux 的文档库文章",
-        url: articleUrl
-      });
-
-      var h1 = document.getElementById("doc-title");
-      if (h1) h1.textContent = title;
-
-      var breadcrumb = document.getElementById("doc-breadcrumb");
-      if (breadcrumb) {
-        if (info.paths.length > 1) {
-          var bcHTML = "";
-          for (var i = 0; i < info.paths.length - 1; i++) {
-            bcHTML += '<a href="' + docHref(info.paths[i]) + '">' +
-                        utils.escapeHTML(info.titles[i]) +
-                      '</a><span class="breadcrumb-sep">/</span>';
-          }
-          bcHTML += '<span class="breadcrumb-current">' + utils.escapeHTML(title) + '</span>';
-          breadcrumb.innerHTML = bcHTML;
-        } else {
-          breadcrumb.innerHTML = "";
-        }
-      }
-
-      return Promise.all([
-        renderDocMarkdown("#doc-body", mdUrl).then(function () {
-          var desc = extractDescription(document.querySelector("#doc-body"));
-          if (!desc) return;
-          upsertMeta("description", desc);
-          setMetaAttr('meta[property="og:description"]',  "content", desc);
-          setMetaAttr('meta[name="twitter:description"]', "content", desc);
-          var ld = document.head.querySelector('script[type="application/ld+json"][data-seo="article"]');
-          if (ld) {
-            try {
-              var obj = JSON.parse(ld.textContent);
-              obj.description = desc;
-              ld.textContent = JSON.stringify(obj);
-            } catch (e) {}
-          }
-        }),
-        renderSidebar(relPath),
-        renderPagination(relPath)
-      ]);
-    });
   }
-  global.initArticlePage = initArticlePage;
+  global.isPureDirectory   = isPureDirectory;
+  global.refreshArticleMeta = refreshArticleMeta;
 
-  /* ---------- 代码块复制 ---------- */
-  var COPY_SVG =
-    '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">' +
-    '<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/>' +
-    '<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>';
-  var CHECK_SVG =
-    '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">' +
-    '<path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>';
-
-  function enhanceCodeBlocks(root) {
-    var pres = root.querySelectorAll("pre");
-    Array.prototype.forEach.call(pres, function (pre) {
-      if (pre.parentElement && pre.parentElement.classList.contains("code-block-wrap")) return;
-      var wrap = document.createElement("div");
-      wrap.className = "code-block-wrap";
-      pre.parentNode.insertBefore(wrap, pre);
-      wrap.appendChild(pre);
-      var btn = document.createElement("button");
-      btn.className = "code-copy-btn";
-      btn.type = "button";
-      btn.setAttribute("aria-label", "复制代码");
-      btn.innerHTML = COPY_SVG;
-      wrap.appendChild(btn);
-      btn.addEventListener("click", function () {
-        var code = pre.querySelector("code");
-        var text = code ? code.textContent : pre.textContent;
-        var done = function () {
-          btn.innerHTML = CHECK_SVG;
-          btn.classList.add("copied");
-          setTimeout(function () {
-            btn.innerHTML = COPY_SVG;
-            btn.classList.remove("copied");
-          }, 1500);
-        };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(done).catch(function () {});
-        } else {
-          done();
-        }
-      });
-    });
-  }
-
-  /* ---------- Markdown 渲染 ---------- */
-  function fillDocUpdated(lastModified) {
-    var el = document.getElementById("doc-updated");
-    if (!el || !lastModified) return;
-    var d = new Date(lastModified);
-    if (isNaN(d.getTime())) return;
-    function p(n) { return (n < 10 ? "0" : "") + n; }
-    el.textContent = "最后更新：" + d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
-  }
-
-  function renderDocMarkdown(selector, mdUrl) {
-    var box = document.querySelector(selector);
-    if (!box) return Promise.resolve();
-    var parse = window.marked && (window.marked.parse || window.marked);
-    if (!parse) {
-      box.innerHTML = '<p class="status-box">Markdown 解析器未加载。</p>';
-      return Promise.resolve();
-    }
-    return fetch(mdUrl).then(function (r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      fillDocUpdated(r.headers.get("Last-Modified"));
-      return r.text();
-    }).then(function (md) {
-      box.innerHTML = parse(md);
-      enhanceCodeBlocks(box);
-    }).catch(function (err) {
-      console.warn("[doc] markdown 加载失败 " + mdUrl + "：", err);
-      box.innerHTML = '<p class="status-box">正文加载失败。</p>';
-    });
-  }
-  global.renderDocMarkdown = renderDocMarkdown;
+  /* 把需要的常量也挂到 global，方便 page 层调用 */
+  global.DOCS_BASE        = DOCS_BASE;
+  global.ARTICLE_PAGE_URL = ARTICLE_PAGE_URL;
+  global.INDEX_PAGE_URL   = "/app/docs";
+  global.SITE_ORIGIN      = SITE_ORIGIN;
+  global.setArticleMeta   = setArticleMeta;
 })(window);
