@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  var SITE_BIRTH = new Date("2026-07-12T02:46:25+08:00").getTime();
+  var SITE_BIRTH = new Date("2026-09-13T02:46:25+08:00").getTime();
 
   /* 递归收集所有文档节点的 id 路径 */
   function walkDocs(list, ids, nodes) {
