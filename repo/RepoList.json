@@ -1,82 +1,68 @@
 [
   {
-    "id": "BTIR-BrainTumor-ImageRecognition",
-    "name": "BTIR-脑肿瘤 MRI 图像分析",
-    "full_name": "ckckh2023/BTIR-BrainTumor-ImageRecognition",
-    "url": "https://btir.xiao-blog.top",
-    "repo": "https://github.com/ckckh2023/BTIR-BrainTumor-ImageRecognition",
-    "other_repo": [
-      { "title": "GitCode", "url": "https://gitcode.com/ckckh2023/BTIR-BrainTumor-ImageRecognition" }
-    ],
-    "desc": "BTIR 是一个面向临床与科研的脑肿瘤 MRI 一站式分析平台。只需在浏览器中拖入 DICOM 或 NIfTI 文件夹，即可自动完成模态匹配、病灶分类与三维分割，并生成综合结论与 AI 解读。内置多用户隔离、异步任务队列与 3D 体渲染，开箱即用。",
-    "stars": 6,
-    "tags": ["Python","JavaScript","HTML","CSS","Shell"]
+    "id": "Start_Notice",
+    "name": "Start_Notice",
+    "full_name": "Nimbulux/Start_Notice",
+    "url": "",
+    "repo": "https://github.com/Nimbulux/Start_Notice",
+    "desc": "管理以防止白板同时启动多个实例",
+    "stars": 1,
+    "tags": [
+      "C++",
+      "C"
+    ]
   },
   {
-    "id": "TrashGo_AIRecognition",
-    "name": "TrashGo智识助手",
-    "full_name": "ckckh2023/TrashGo_AIRecognition",
-    "url": "https://trashgo.xiao-blog.top",
-    "repo": "https://github.com/ckckh2023/TrashGo_AIRecognition",
-    "other_repo": [
-      { "title": "Gitee", "url": "https://gitee.com/ckckh2023/TrashGo_AIRecognition" },
-      { "title": "GitCode", "url": "https://gitcode.com/ckckh2023/TrashGo_AIRecognition" }
-    ],
-    "desc": "TrashGo 是一款集多种图像信息识别功能于一体的智能工具，旨在帮助用户快速识别图像信息，并提供趣味互动体验。无论是垃圾分类、人脸识别，TrashGo 都能轻松应对。",
-    "stars": 16,
-    "tags": ["C++","QML","CMake","C"]
-  },
-  {
-    "id": "Xiao-Blog",
-    "name": "个人博客网页",
-    "full_name": "ckckh2023/Xiao-Blog",
-    "url": "https://xiao-blog.top/",
-    "repo": "https://github.com/ckckh2023/Xiao-Blog",
-    "other_repo": [
-      { "title": "Gitee", "url": "https://gitee.com/ckckh2023/Xiao-Blog" },
-      { "title": "GitCode", "url": "https://gitcode.com/ckckh2023/Xiao-Blog" }
-    ],
-    "desc": "个人技术博客站点，部署于 Cloudflare Pages。内置文档知识库、项目展示、工具分享、留言板与好友页等模块。",
-    "stars": 5,
-    "tags": ["JavaScript", "CSS", "HTML"]
-  },
-  {
-    "id": "TsingHuaelt-VMIC",
-    "name": "清英在线-虚拟麦克风插件",
-    "full_name": "ckckh2023/TsingHuaelt-VMIC",
-    "url": null,
-    "repo": "https://github.com/ckckh2023/TsingHuaelt-VMIC",
-    "other_repo": [
-      { "title": "Gitee", "url": "https://gitee.com/ckckh2023/TsingHuaelt-VMIC" },
-      { "title": "GitCode", "url": "https://gitcode.com/ckckh2023/TsingHuaelt-VMIC" }
-    ],
-    "desc": "让清英在线的网页录音只能拿到本插件注入的本地音频，而不是真实麦克风。",
-    "stars": 5,
-    "tags": ["JavaScript", "CSS", "HTML"]
-  },
-  {
-    "id": "BDWLMC-Web",
-    "name": "Minecraft-基岩荒地服务器官网",
-    "full_name": "ckckh2023/BDWLMC-Web",
-    "url": "https://bdwlmc.xiao-blog.top",
-    "repo": "https://github.com/ckckh2023/BDWLMC-Web",
-    "other_repo": [
-      { "title": "Gitee", "url": "https://gitee.com/ckckh2023/BDWLMC-Web" },
-      { "title": "GitCode", "url": "https://gitcode.com/ckckh2023/BDWLMC-Web" }
-    ],
-    "desc": "Minecraft-基岩荒地服务器官方网站，使用 Xiao-Blog 项目利用 AI 二次开发。",
-    "stars": 3,
-    "tags": ["HTML", "CSS", "JavaScript"]
-  },
-  {
-    "id": "EasyStudent-JustFreshMan",
-    "name": "极简学生信息管理系统",
-    "full_name": "ckckh2023/EasyStudent-JustFreshMan",
-    "url": null,
-    "repo": "https://github.com/ckckh2023/EasyStudent-JustFreshMan",
-    "other_repo": [],
-    "desc": "纯终端的学生信息管理系统",
+    "id": "fast-xp-pickup",
+    "name": "fast-xp-pickup",
+    "full_name": "Nimbulux/fast-xp-pickup",
+    "url": "",
+    "repo": "https://github.com/Nimbulux/fast-xp-pickup",
+    "desc": "更快的吸收经验插件",
     "stars": 0,
-    "tags": ["C++"]
+    "tags": [
+      "Java"
+    ]
+  },
+  {
+    "id": "Nimbulux",
+    "name": "Nimbulux ✨",
+    "full_name": "Nimbulux/Nimbulux",
+    "url": "",
+    "repo": "https://github.com/Nimbulux/Nimbulux",
+    "desc": "✨Special✨ Repository",
+    "stars": 0,
+    "tags": [
+      "Python"
+    ]
+  },
+  {
+    "id": "Xiao-Blog-Edit",
+    "name": "Xiao-Blog-Edit",
+    "full_name": "Nimbulux/Xiao-Blog-Edit",
+    "url": "",
+    "repo": "https://github.com/Nimbulux/Xiao-Blog-Edit",
+    "desc": "由Xiao-Blog克隆 为自己的网站调整后套用",
+    "stars": 0,
+    "tags": [
+      "JavaScript",
+      "CSS",
+      "HTML"
+    ]
+  },
+  {
+    "id": "nimbulux.github.io",
+    "name": "一个博客",
+    "full_name": "Nimbulux/nimbulux.github.io",
+    "url": "https://nimbulux.github.io/",
+    "repo": "https://github.com/Nimbulux/nimbulux.github.io",
+    "desc": "一个网站的梦",
+    "stars": 0,
+    "tags": [
+      "HTML",
+      "Python",
+      "JavaScript",
+      "CSS"
+    ]
   }
 ]
