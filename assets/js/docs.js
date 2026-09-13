@@ -4,13 +4,13 @@
   var utils = global.Utils;
 
   /* ---------- 常量 ---------- */
-  var DOCS_BASE        = "/posts";           // markdown 资源根目录
-  var DOCS_LIST_URL    = "/pages/list.json"; // 目录数据
-  var ARTICLE_PAGE_URL = "/app/docs/article";    // 文章模板页
-  var INDEX_PAGE_URL   = "/app/docs";            // 目录首页
+  var DOCS_BASE        = "/posts";
+  var DOCS_LIST_URL    = "/pages/list.json";
+  var ARTICLE_PAGE_URL = "/app/docs/article";
+  var INDEX_PAGE_URL   = "/app/docs";
   var docsListCache    = null;
 
-  /* ---------- SEO 元数据（OG / Twitter Card / canonical / JSON-LD） ---------- */
+  /* ---------- SEO ---------- */
   var SITE_ORIGIN = "https://nimbulux.github.io";
   var SITE_AUTHOR = "Nimbulux_";
   var SITE_AVATAR = "https://nimbulux.github.io/public/favicon.jpg";
@@ -20,7 +20,6 @@
     if (!el) return;
     el.setAttribute(attr, value);
   }
-
   function upsertMeta(name, content) {
     var el = document.head.querySelector('meta[name="' + name + '"]');
     if (!el) {
@@ -30,7 +29,6 @@
     }
     el.setAttribute("content", content);
   }
-
   function upsertJSONLD(obj) {
     var el = document.head.querySelector('script[type="application/ld+json"][data-seo="article"]');
     if (!el) {
@@ -41,7 +39,6 @@
     }
     el.textContent = JSON.stringify(obj);
   }
-
   function setArticleMeta(opt) {
     var titlePath = opt.titlePath && opt.titlePath.length ? opt.titlePath : [opt.title || ""];
     var headline  = titlePath[titlePath.length - 1];
@@ -53,7 +50,6 @@
     setMetaAttr('meta[property="og:description"]', "content", opt.description);
     setMetaAttr('meta[property="og:url"]',         "content", opt.url);
     setMetaAttr('meta[property="og:image"]',       "content", opt.image || SITE_AVATAR);
-
     setMetaAttr('meta[name="twitter:title"]',       "content", fullTitle);
     setMetaAttr('meta[name="twitter:description"]', "content", opt.description);
     setMetaAttr('meta[name="twitter:image"]',       "content", opt.image || SITE_AVATAR);
@@ -97,7 +93,7 @@
   }
   global.fetchDocsList = fetchDocsList;
 
-  /* ---------- 节点工具函数 ---------- */
+  /* ---------- 节点工具 ---------- */
   function nodeTitle(node) {
     return (node && node.info && node.info.title) || (node && node.name) || "";
   }
@@ -107,24 +103,25 @@
   function hasChildren(node) {
     return !!(node && node.children && node.children.length);
   }
-  /* 节点是否带正文（可渲染文章页）：article 或 mixed，或者无 type 但有 info */
   function isArticleNode(node) {
     if (!node) return false;
     if (node.type === "article" || node.type === "mixed") return true;
     if (node.type === "directory") return false;
-    return !!node.info; // 兼容无 type 的老数据
+    return !!node.info;
   }
-  /* 纯目录：有子节点且自身无正文，点击时跳到第一个叶子 */
   function isPureDirectory(node) {
     return hasChildren(node) && !isArticleNode(node);
   }
+
+  /* 对外暴露，便于主页脚本使用 */
+  global.nodeTitle  = nodeTitle;
+  global.nodePath   = nodePath;
+  global.hasChildren = hasChildren;
 
   function encodePath(p) {
     return String(p).split("/").filter(Boolean).map(encodeURIComponent).join("/");
   }
 
-  /* 文章详情页链接：/docs/article?path=作文/辙痕与星轨之间
-     兼容数组入参（自动 join） */
   function docHref(pathOrIds) {
     var path = Array.isArray(pathOrIds)
       ? pathOrIds.join("/")
@@ -133,7 +130,6 @@
   }
   global.docHref = docHref;
 
-  /* 沿 relative_path 查找节点，返回 { node, titles[], paths[] } 或 null */
   function findNodeInfo(list, relPath) {
     var parts = String(relPath || "").split("/").filter(Boolean);
     if (!parts.length) return null;
@@ -160,7 +156,6 @@
   }
   global.findNodeInfo = findNodeInfo;
 
-  /* 从 node 沿第一个 child 递归到叶子，返回叶子的 relative_path */
   function firstLeafPath(node) {
     var cur = node, guard = 0;
     while (hasChildren(cur) && guard++ < 64) cur = cur.children[0];
@@ -168,27 +163,20 @@
   }
   global.firstLeafPath = firstLeafPath;
 
-  /* 兼容旧接口：主页原先调用 firstLeafIds(node, parentIds) 得到 id 数组。
-     新版返回 relative_path 的分段数组，配合 docHref 使用。 */
-  function firstLeafIds(node /*, parentIds */) {
+  /* 兼容旧接口：返回路径分段数组 */
+  function firstLeafIds(node) {
     var p = firstLeafPath(node);
     return p ? p.split("/").filter(Boolean) : [];
   }
   global.firstLeafIds = firstLeafIds;
 
-  /* 展平为文章分页序列：
-     - 遍历整棵树（前序）
-     - 凡是 isArticleNode 的节点都进序列（article 和 mixed）
-     - 纯 directory 不进序列
-     每项 → { path, titles: [从根到该节点的标题] } */
+  /* 扁平化（主页/搜索等可用；分页不再使用） */
   function flattenDocsSequence(list) {
     var seq = [];
     (function walk(nodes, titles) {
       (nodes || []).forEach(function (n) {
         var t = titles.concat(nodeTitle(n));
-        if (isArticleNode(n)) {
-          seq.push({ path: nodePath(n), titles: t });
-        }
+        if (isArticleNode(n)) seq.push({ path: nodePath(n), titles: t });
         if (hasChildren(n)) walk(n.children, t);
       });
     })(list, []);
@@ -217,7 +205,6 @@
         };
 
         holder.addEventListener("click", function (e) {
-          /* 折叠图标：切换折叠状态 */
           var toggle = e.target.closest(".sidebar-toggle");
           if (toggle) {
             e.preventDefault();
@@ -225,10 +212,7 @@
             if (g1) toggleGroup(g1);
             return;
           }
-          /* mixed 节点的标题链接：让浏览器正常跳转 */
           if (e.target.closest("a.sidebar-group-title-link")) return;
-
-          /* 其它情况（点击 directory 的组头空白区）：切换折叠 */
           var header = e.target.closest(".sidebar-group-header");
           if (!header) return;
           var g2 = header.closest(".sidebar-group");
@@ -239,7 +223,6 @@
           if (e.key !== "Enter" && e.key !== " ") return;
           var header = e.target.closest(".sidebar-group-header");
           if (!header) return;
-          /* 若焦点在标题链接上，让浏览器处理 */
           if (e.target.closest("a.sidebar-group-title-link")) return;
           e.preventDefault();
           var group = header.closest(".sidebar-group");
@@ -252,12 +235,6 @@
   }
   global.renderSidebar = renderSidebar;
 
-  /* 递归渲染侧边栏节点：
-     - 有 children → 折叠组
-       · type === "mixed"：标题渲染为 <a class="sidebar-group-title sidebar-group-title-link">
-         （点击进文章页），折叠图标单独控制展开/收起
-       · 其它（directory）：标题为纯 <span>，整行点击切换折叠
-     - 无 children → 叶子链接 */
   function renderSidebarNode(node, depth, currentPath) {
     var path  = nodePath(node);
     var title = utils.escapeHTML(nodeTitle(node));
@@ -274,9 +251,7 @@
         '<div class="sidebar-group sidebar-depth-' + depth + groupActive + mixedCls + collapsed + '">' +
           '<div class="sidebar-group-header" role="button" tabindex="0" aria-expanded="' + expanded + '">';
       if (isMixed) {
-        html += '<a class="sidebar-group-title sidebar-group-title-link" href="' + docHref(path) + '">' +
-                  title +
-                '</a>';
+        html += '<a class="sidebar-group-title sidebar-group-title-link" href="' + docHref(path) + '">' + title + '</a>';
       } else {
         html += '<span class="sidebar-group-title">' + title + '</span>';
       }
@@ -297,12 +272,45 @@
     return '<a class="' + cls + '" href="' + docHref(path) + '">' + title + '</a>';
   }
 
-    /* ---------- 上下页分页 ---------- */
-  /* 仅对 type === "article" 的节点显示分页；
-     分页范围限定为同一父节点下的直接 article 子节点；
-     list.json 为倒序（最新在前），因此：
-       - 更早的文章（索引 +1）作为「上一篇」
-       - 更新的文章（索引 -1）作为「下一篇」 */
+  /* ---------- 分页（核心修改） ---------- */
+  /* 收集「兄弟文章池」：从当前文章的父层开始向上回溯，
+     找到第一个满足以下条件的池：
+       1. 该池中包含当前文章（按 relative_path 匹配）
+       2. 池内至少有一篇 type === "article" 的文章
+     返回该池中所有 type === "article" 的节点，保持 list 原顺序。 */
+  function collectSiblingArticles(list, info) {
+    var currentPath = info.paths[info.paths.length - 1];
+
+    for (var depth = info.paths.length - 1; depth >= 0; depth--) {
+      var ancestorPath = depth === 0 ? "" : info.paths.slice(0, depth).join("/");
+      var pool;
+
+      if (depth === 0) {
+        pool = list;
+      } else {
+        var ancInfo = findNodeInfo(list, ancestorPath);
+        if (!ancInfo || !ancInfo.node.children) continue;
+        pool = ancInfo.node.children;
+      }
+
+      var articles = (pool || []).filter(function (n) {
+        return n.type === "article";
+      });
+
+      var containsCurrent = articles.some(function (a) {
+        return nodePath(a) === currentPath;
+      });
+
+      if (containsCurrent && articles.length >= 1) {
+        return articles;
+      }
+    }
+    return [];
+  }
+
+  /* 仅对 type === "article" 显示分页。
+     list.json 为倒序（最新在前）：idx + 1 = 更早 = 上一篇；
+                                    idx - 1 = 更新 = 下一篇。 */
   function renderPagination(currentPath) {
     var holder = document.getElementById("pagination");
     if (!holder) return Promise.resolve();
@@ -313,24 +321,9 @@
         return;
       }
 
-      var node = info.node;
-      var siblings;
+      var node     = info.node;
+      var siblings = collectSiblingArticles(list, info);
 
-      if (info.paths.length === 1) {
-        // 顶层文章：兄弟为 list 中所有 article
-        siblings = (list || []).filter(function (n) { return n.type === "article"; });
-      } else {
-        // 非顶层：找到父节点，取父节点下直接子 article
-        var parentPath = info.paths.slice(0, -1).join("/");
-        var parentInfo = findNodeInfo(list, parentPath);
-        if (!parentInfo || !parentInfo.node.children) {
-          holder.innerHTML = "";
-          return;
-        }
-        siblings = parentInfo.node.children.filter(function (n) { return n.type === "article"; });
-      }
-
-      // 找到当前文章在兄弟列表中的索引
       var idx = -1;
       for (var i = 0; i < siblings.length; i++) {
         if (nodePath(siblings[i]) === nodePath(node)) { idx = i; break; }
@@ -340,9 +333,9 @@
         return;
       }
 
-      // 倒序列表：更早在 idx+1，更新在 idx-1
-      var prevNode = siblings[idx + 1] || null;  // 更早 -> 上一篇
-      var nextNode = siblings[idx - 1] || null;  // 更新 -> 下一篇
+      /* 倒序：更早（idx+1）作为上一篇，更新（idx-1）作为下一篇 */
+      var prevNode = siblings[idx + 1] || null;
+      var nextNode = siblings[idx - 1] || null;
 
       function btnHTML(item, type) {
         if (!item) {
@@ -370,10 +363,7 @@
   }
   global.renderPagination = renderPagination;
 
-  /* ---------- 文章模板页初始化 ---------- */
-  /* ?path=<relative_path>
-     - 纯目录（directory）→ 重定向到第一个叶子
-     - article / mixed    → 渲染自身正文（mixed 同时展示侧边栏展开 + 分页参与） */
+  /* ---------- 文章模板页 ---------- */
   function initArticlePage() {
     var query = new URLSearchParams(window.location.search);
     var path  = (query.get("path") || "").trim();
@@ -391,16 +381,15 @@
 
       var node = info.node;
 
-      /* 纯目录：跳到第一个叶子 */
       if (isPureDirectory(node)) {
         window.location.replace(docHref(firstLeafPath(node)));
         return;
       }
 
-      /* article / mixed → 渲染 */
       var titlePath = info.titles.length ? info.titles : [node.name || ""];
       var title     = titlePath[titlePath.length - 1];
       var relPath   = nodePath(node) || path;
+      /* ★ Markdown 文件改为 page.md */
       var mdUrl     = DOCS_BASE + "/" + relPath + "/page.md";
       var articleUrl = SITE_ORIGIN + docHref(relPath);
 
@@ -434,8 +423,8 @@
           var desc = extractDescription(document.querySelector("#doc-body"));
           if (!desc) return;
           upsertMeta("description", desc);
-          setMetaAttr('meta[property="og:description"]',    "content", desc);
-          setMetaAttr('meta[name="twitter:description"]',   "content", desc);
+          setMetaAttr('meta[property="og:description"]',  "content", desc);
+          setMetaAttr('meta[name="twitter:description"]', "content", desc);
           var ld = document.head.querySelector('script[type="application/ld+json"][data-seo="article"]');
           if (ld) {
             try {
@@ -452,7 +441,7 @@
   }
   global.initArticlePage = initArticlePage;
 
-  /* ---------- 代码块复制按钮 ---------- */
+  /* ---------- 代码块复制 ---------- */
   var COPY_SVG =
     '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">' +
     '<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/>' +
@@ -495,7 +484,7 @@
     });
   }
 
-  /* ---------- Markdown 正文渲染 ---------- */
+  /* ---------- Markdown 渲染 ---------- */
   function fillDocUpdated(lastModified) {
     var el = document.getElementById("doc-updated");
     if (!el || !lastModified) return;

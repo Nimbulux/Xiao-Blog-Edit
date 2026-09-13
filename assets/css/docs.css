@@ -381,3 +381,159 @@
 }
 .doc-body table a { color: var(--link); }
 .doc-body table a:hover { color: var(--link-hover); }
+
+/* ============================================================
+   代码高亮（highlight.js 类名）
+   依赖：highlight.js；颜色变量请按你的主题选择器调整
+   ============================================================ */
+
+/* ---------- 亮色主题颜色 ---------- */
+:root {
+  --hl-comment:     #6e7781;
+  --hl-keyword:     #cf222e;
+  --hl-string:      #0a3069;
+  --hl-number:      #0550ae;
+  --hl-function:    #8250df;
+  --hl-variable:    #953800;
+  --hl-type:        #953800;
+  --hl-tag:         #116329;
+  --hl-attr:        #0550ae;
+  --hl-builtin:     #0550ae;
+  --hl-meta:        #6e7781;
+  --hl-addition-bg: #dafbe1;
+  --hl-addition-fg: #116329;
+  --hl-deletion-bg: #ffebe9;
+  --hl-deletion-fg: #82071e;
+  --hl-line-hl:     rgba(255, 212, 0, 0.16);
+}
+
+/* ---------- 暗色主题颜色（选择器改成你实际用的那个） ---------- */
+[data-theme="dark"] {
+  --hl-comment:     #8b949e;
+  --hl-keyword:     #ff7b72;
+  --hl-string:      #a5d6ff;
+  --hl-number:      #79c0ff;
+  --hl-function:    #d2a8ff;
+  --hl-variable:    #ffa657;
+  --hl-type:        #ffa657;
+  --hl-tag:         #7ee787;
+  --hl-attr:        #79c0ff;
+  --hl-builtin:     #79c0ff;
+  --hl-meta:        #8b949e;
+  --hl-addition-bg: rgba(46, 160, 67, 0.15);
+  --hl-addition-fg: #7ee787;
+  --hl-deletion-bg: rgba(248, 81, 73, 0.15);
+  --hl-deletion-fg: #ffa198;
+  --hl-line-hl:     rgba(255, 212, 0, 0.10);
+}
+
+/* ---------- 基础 ---------- */
+.docs-content pre code.hljs {
+  display: block;
+  background: none;
+  padding: 0;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: visible;   /* 由外层 pre 负责滚动 */
+  tab-size: 4;
+}
+/* 未识别语言时不高亮，保持原色 */
+.docs-content pre code:not(.hljs) { color: var(--text); }
+
+/* ---------- 注释 ---------- */
+.hljs-comment,
+.hljs-quote {
+  color: var(--hl-comment);
+  font-style: italic;
+}
+
+/* ---------- 关键字 / 字面量 ---------- */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-doctag,
+.hljs-name,
+.hljs-strong {
+  color: var(--hl-keyword);
+  font-weight: 600;
+}
+
+/* ---------- 字符串 / 正则 ---------- */
+.hljs-string,
+.hljs-regexp,
+.hljs-char.escape_,
+.hljs-link {
+  color: var(--hl-string);
+}
+
+/* ---------- 数字 / 变量 / 属性 ---------- */
+.hljs-number,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-attr,
+.hljs-attribute,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: var(--hl-number);
+}
+
+/* ---------- 函数 / 标题 / 章节 ---------- */
+.hljs-title,
+.hljs-title.function_,
+.hljs-section,
+.hljs-selector-id {
+  color: var(--hl-function);
+  font-weight: 600;
+}
+
+/* ---------- 类型 / 类名 ---------- */
+.hljs-type,
+.hljs-title.class_,
+.hljs-class .hljs-title,
+.hljs-params {
+  color: var(--hl-type);
+}
+
+/* ---------- 标签 / 符号 ---------- */
+.hljs-tag,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-code {
+  color: var(--hl-tag);
+}
+
+/* ---------- 内置对象 / 元信息 ---------- */
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-meta,
+.hljs-meta .hljs-keyword,
+.hljs-meta .hljs-string,
+.hljs-selector-class {
+  color: var(--hl-builtin);
+}
+
+/* ---------- diff 增删 ---------- */
+.hljs-addition {
+  color: var(--hl-addition-fg);
+  background: var(--hl-addition-bg);
+  display: inline-block;
+  width: 100%;
+}
+.hljs-deletion {
+  color: var(--hl-deletion-fg);
+  background: var(--hl-deletion-bg);
+  display: inline-block;
+  width: 100%;
+}
+
+/* ---------- 行内强调 ---------- */
+.hljs-emphasis { font-style: italic; }
+.hljs-strong   { font-weight: 700; }
+
+/* ---------- 可选：高亮行 ---------- */
+.hljs-line-highlight {
+  display: inline-block;
+  width: 100%;
+  background: var(--hl-line-hl);
+}
