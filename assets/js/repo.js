@@ -15,7 +15,7 @@
 
   /* ---------- star.json 数据加载 ---------- */
   function fetchStarProjects() {
-    return utils.fetchJSON(root() + "repo/star.json").then(function (list) {
+    return utils.fetchJSON(root() + "repo/RepoStar.json").then(function (list) {
       return Array.isArray(list) ? list : [];
     }).catch(function (err) {
       console.warn("[star] repo/star.json 加载失败：", err);
