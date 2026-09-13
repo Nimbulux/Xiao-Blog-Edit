@@ -395,7 +395,7 @@
 
       setArticleMeta({
         titlePath: titlePath,
-        description: "ckckh2023 的文档库文章",
+        description: "Nimbulux 的文档库文章",
         url: articleUrl
       });
 
