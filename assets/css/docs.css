@@ -479,6 +479,51 @@
   .docs-toc { display: none; }
 }
 
+/* ---------- TOC 跳转后目标标题闪烁提示 ---------- */
+:root {
+  --toc-flash-bg:    rgba(9, 105, 218, 0.14);
+  --toc-flash-ring:  rgba(9, 105, 218, 0.28);
+  --toc-flash-count: 2;         /* 闪烁次数 */
+  --toc-flash-dur:   0.55s;     /* 单次时长 */
+}
+[data-theme="dark"] {
+  --toc-flash-bg:    rgba(88, 166, 255, 0.18);
+  --toc-flash-ring:  rgba(88, 166, 255, 0.34);
+}
+
+@keyframes toc-target-flash {
+  from {
+    background-color: var(--toc-flash-bg);
+    box-shadow: 0 0 0 6px var(--toc-flash-ring);
+  }
+  to {
+    background-color: transparent;
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+.toc-target-flash {
+  border-radius: 6px;
+  animation: toc-target-flash var(--toc-flash-dur) ease-out var(--toc-flash-count);
+}
+
+/* ★ 减少动态效果：不取消，只降强度 + 放慢 + 只闪一次 */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --toc-flash-bg:    rgba(9, 105, 218, 0.06);
+    --toc-flash-ring:  rgba(9, 105, 218, 0.10);
+    --toc-flash-count: 1;
+    --toc-flash-dur:   0.9s;
+  }
+  [data-theme="dark"] {
+    --toc-flash-bg:    rgba(88, 166, 255, 0.08);
+    --toc-flash-ring:  rgba(88, 166, 255, 0.14);
+  }
+  .toc-target-flash {
+    animation-timing-function: ease-in-out;
+  }
+}
+
 /* ============================================================
    代码高亮（highlight.js 类名）
    依赖：highlight.js；颜色变量请按你的主题选择器调整

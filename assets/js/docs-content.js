@@ -170,15 +170,60 @@
     nav.innerHTML = "";
     renderChildren(root.children, nav);
 
-    /* 4. 点击平滑滚动 */
+        /* 4. 点击平滑滚动 + 目标闪烁提示（尊重减少动态效果） */
+    var STICKY_OFFSET = 72;
+    var reduceMotion = window.matchMedia &&
+                       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function scrollToId(id) {
+      var target = document.getElementById(id);
+      if (!target) return null;
+      var top = target.getBoundingClientRect().top + window.pageYOffset - STICKY_OFFSET;
+      if (top < 0) top = 0;
+      if (reduceMotion) {
+        /* 减少动态：直接跳，不做平滑滚动 */
+        window.scrollTo(0, top);
+      } else {
+        try { window.scrollTo({ top: top, behavior: "smooth" }); }
+        catch (err) { window.scrollTo(0, top); }
+      }
+      return target;
+    }
+
+    function flashTarget(el) {
+      if (!el) return;
+      el.classList.remove("toc-target-flash");
+      void el.offsetWidth;
+      el.classList.add("toc-target-flash");
+    }
+
+    /* 等平滑滚动停下来再闪；reduce 时立即闪 */
+    function afterScroll(cb) {
+      if (reduceMotion) { cb(); return; }
+      if ("onscrollend" in window) {
+        var done = false;
+        var fire = function () {
+          if (done) return;
+          done = true;
+          window.removeEventListener("scrollend", fire);
+          cb();
+        };
+        window.addEventListener("scrollend", fire, { once: true });
+        setTimeout(fire, 900);
+      } else {
+        setTimeout(cb, 450);
+      }
+    }
+
     nav.addEventListener("click", function (e) {
       var link = e.target.closest(".toc-item");
       if (!link) return;
       e.preventDefault();
-      var target = document.getElementById(link.dataset.id);
+      var id = link.dataset.id;
+      var target = scrollToId(id);
       if (!target) return;
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-      if (history.replaceState) history.replaceState(null, "", "#" + link.dataset.id);
+      afterScroll(function () { flashTarget(target); });
+      if (history.replaceState) history.replaceState(null, "", "#" + encodeURIComponent(id));
     });
 
     /* 5. 滚动跟踪：展开祖先 + 高亮 */
