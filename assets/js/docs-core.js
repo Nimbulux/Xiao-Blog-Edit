@@ -350,8 +350,12 @@
       } catch (e) {}
     }
   }
-  global.isPureDirectory   = isPureDirectory;
+  global.isPureDirectory    = isPureDirectory;
   global.refreshArticleMeta = refreshArticleMeta;
+  global.extractDescription = extractDescription;
+  global.upsertMeta         = upsertMeta;            /* 顺手挂上，方便将来复用 */
+  global.upsertJSONLD       = upsertJSONLD;
+  global.setMetaAttr        = setMetaAttr;
 
   /* 把需要的常量也挂到 global，方便 page 层调用 */
   global.DOCS_BASE        = DOCS_BASE;
