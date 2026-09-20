@@ -141,6 +141,11 @@ img { max-width: 100%; display: block; }
   font-weight: 700;
 }
 .site-nav .nav-item.active::after { transform: scaleX(1); }
+/* 低分辨率屏（devicePixelRatio ≤ 1，如 1K/1080p 屏 100% 缩放）下
+   2px 仅渲染为 2 物理像素，视觉偏细；提高到 3px 与高分屏观感一致 */
+@media (max-resolution: 1dppx) {
+  .site-nav .nav-item::after { height: 3px; }
+}
 
 .site-nav .nav-spacer { flex: 1; }
 
