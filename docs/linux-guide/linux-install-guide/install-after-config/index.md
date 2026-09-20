@@ -11,7 +11,7 @@ sudo apt update
 sudo apt upgrade -y
 ```
 
-> 此配置可以确保系统内核、固件、驱动等处于最新状态，减少后续问题，关于apt仓库的我的文档[点此]()查看。
+> 此配置可以确保系统内核、固件、驱动等处于最新状态，减少后续问题，我写的关于 apt 仓库的文档[点此](https://xiao-blog.top/docs/article?id=linux-guide&sub=software-package-guide&sub2=apt-repository-guide)查看。
 
 ---
 
@@ -122,7 +122,7 @@ sudo ufw status verbose
 
 ---
 
-## 可选常用软件
+## 安装常用软件
 
 这些是一些命令行工具，你也可以去我的[分享页](https://xiao-blog.top/share/)寻找好用的 Linux 桌面应用。
 
@@ -130,3 +130,4 @@ sudo ufw status verbose
 sudo apt install git curl vim # 此为一般常用工具等，后续更新
 ```
 
+> 你可以学习包管理系统，Ubuntu 使用的是 apt 仓库管理系统，可以查看[此文档](https://xiao-blog.top/docs/article?id=linux-guide&sub=software-package-guide&sub2=apt-repository-guide)；关于 Ubuntu 强制推行的风评较差的 snap 仓库管理系统卸载方法可以查看[此文档](https://xiao-blog.top/docs/article?id=linux-guide&sub=software-package-guide&sub2=snap-uninstall-guide)。

@@ -12,6 +12,12 @@
           { "id": "wsl-ubuntu", "title": "Windows 下安装 Linux 子系统（WSL）" },
           { "id": "install-after-config", "title": "Linux 安装后初步配置教程" }
         ]
+      },
+      { "id": "software-package-guide", "title": "软件包管理相关指导",
+        "children": [
+          { "id": "apt-repository-guide", "title": "apt 软件仓库使用方法" },
+          { "id": "snap-uninstall-guide", "title": "Snap 软件包完全移除教程" }
+        ]
       }
     ]
   },
