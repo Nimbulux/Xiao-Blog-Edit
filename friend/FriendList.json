@@ -26,13 +26,13 @@
   {
 	  "id": "cloudy-rhh",
 	  "avatar": "https://github.com/cloudy-rhh.png",
-    "bio": "喜爱探讨计算机知识，目前仍在确定自己的方向",
+    "bio": "喜爱探讨计算机知识，目前正在尝试深入嵌入式方向，参与过 TrashGo 项目的开发",
     "url": "https://github.com/cloudy-rhh"
   },
   {
 	  "id": "Nimbulux",
 	  "avatar": "https://nimbulux.github.io/public/favicon.jpg",
-    "bio": "一个喜欢 Arch Linux的人， BDWL 基岩荒地 MC 服务器玩家，使用我的博客网站项目 Xiao-Blog 复刻了一个新的个人博客",
+    "bio": "Arch Linux 与 LGPL 教徒，BDWL 基岩荒地 MC 服务器玩家，使用我的博客网站项目 Xiao-Blog 复刻了一个新的个人博客",
     "url": "https://nimbulux.github.io/" 
   }
 ]
