@@ -60,13 +60,12 @@ sudo sed -i 's|http://archive.ubuntu.com/ubuntu|https://mirrors.tuna.tsinghua.ed
 sudo apt update
 ```
 
-> 常用国内镜像：
-> - 清华：`https://mirrors.tuna.tsinghua.edu.cn/ubuntu` 
-> - 阿里：`https://mirrors.aliyun.com/ubuntu`
-> - 中科大：`https://mirrors.ustc.edu.cn/ubuntu`
-> - 华为云：`https://repo.huaweicloud.com/ubuntu`
-
-> **警告**：现在不建议使用清华源，清华镜像源由于削减存储空间，已不再维护许多不常用的软件源。
+常用国内镜像：
+- 清华：`https://mirrors.tuna.tsinghua.edu.cn/ubuntu` 
+    > **警告**：现在不建议使用清华源，清华镜像源由于削减存储空间，已不再维护许多不常用的软件源。
+- 阿里：`https://mirrors.aliyun.com/ubuntu`
+- 中科大：`https://mirrors.ustc.edu.cn/ubuntu`
+- 华为云：`https://repo.huaweicloud.com/ubuntu`
 
 > 更换后务必执行 `sudo apt update` 使新源生效。若出现 Hash 校验失败，多为镜像同步未完成，可更换其他镜像或等待几小时后重试。
 

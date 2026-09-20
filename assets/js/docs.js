@@ -434,6 +434,18 @@
     });
   }
 
+  /* ---------- 代码语法高亮 ---------- */
+  function highlightCodeBlocks(root) {
+    if (!global.hljs) return;
+    if (!highlightCodeBlocks._aliased) {
+      try { global.hljs.registerAliases(["pwsh"], { languageName: "powershell" }); } catch (e) {}
+      highlightCodeBlocks._aliased = true;
+    }
+    Array.prototype.forEach.call(root.querySelectorAll("pre code"), function (block) {
+      try { global.hljs.highlightElement(block); } catch (e) {}
+    });
+  }
+
   /* ---------- Markdown 正文渲染 ----------
       selector: 正文容器选择器
       mdUrl:    markdown 文件 URL（相对路径即可，如 ./index.md）
@@ -470,6 +482,7 @@
           img.src = mdDir + s;
         }
       });
+      highlightCodeBlocks(box);
       enhanceCodeBlocks(box);
     }).catch(function (err) {
       console.warn("[doc] markdown 加载失败 " + mdUrl + "：", err);
