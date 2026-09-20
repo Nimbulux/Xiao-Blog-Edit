@@ -65,4 +65,7 @@
     setNum("stat-shares", res[2].length + res[3].length);
     setNum("stat-guestbook", (res[4] && res[4].list) ? res[4].list.length : 0);
   });
+
+  var em = document.getElementById("about-email");
+  if (em) em.href = "ma" + "ilto:" + "fighten" + "ed2023@wust.ed" + "u.cn";
 })(window);
