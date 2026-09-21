@@ -208,28 +208,28 @@ Wrangler CLI 可集成到任意 CI/CD 平台。推荐使用 API Token 而非交�
 
 ## 常见问题
 
-### 构建失败：Module not found
+### Q：构建失败：Module not found
 
-多为构建命令或输出目录配置错误。确认 Framework preset 与项目实际框架一致；若使用 monorepo，正确填写 Root directory。可在 Dashboard → Deployments → 失败记录 → **Retry deployment** 查看完整日志定位。
+**A：** 多为构建命令或输出目录配置错误。确认 Framework preset 与项目实际框架一致；若使用 monorepo，正确填写 Root directory。可在 Dashboard → Deployments → 失败记录 → **Retry deployment** 查看完整日志定位。
 
-### wrangler pages deploy 报错 "project not found"
+### Q：wrangler pages deploy 报错 "project not found"
 
-项目名拼写错误或尚未创建。先用 `npx wrangler pages project list` 查看已有项目；首次部署务必先执行 `pages project create`。
+**A：** 项目名拼写错误或尚未创建。先用 `npx wrangler pages project list` 查看已有项目；首次部署务必先执行 `pages project create`。
 
-### 部署后页面空白或路由 404
+### Q：部署后页面空白或路由 404
 
-Cloudflare Pages 对单页应用（SPA）默认将所有未匹配路径回退到 `index.html`，无需额外配置。若仍 404，检查 `_routes.json` 或 `_redirects` 是否误排除了相关路径。可在发布目录添加 `_redirects`：
+**A：** Cloudflare Pages 对单页应用（SPA）默认将所有未匹配路径回退到 `index.html`，无需额外配置。若仍 404，检查 `_routes.json` 或 `_redirects` 是否误排除了相关路径。可在发布目录添加 `_redirects`：
 
 ```
 /*  /index.html  200
 ```
 
-### Functions 不生效
+### Q：Functions 不生效
 
-确认 Edge Fuctions 函数文件位于仓库的 `functions/` 目录下，且文件名符合路由约定。Wrangler 部署时 `pages_build_output_dir` 应指向含 `functions/` 的项目根目录，而非仅构建产物目录！
+**A：** 确认 Edge Fuctions 函数文件位于仓库的 `functions/` 目录下，且文件名符合路由约定。Wrangler 部署时 `pages_build_output_dir` 应指向含 `functions/` 的项目根目录，而非仅构建产物目录！
 
 > 本人已经遇上过这样的情况，请严格注意函数文件位置！
 
-### 超出免费额度
+### Q：超出免费额度
 
-免费额度每月 500 次构建。频繁构建可合并提交或仅在必要时部署，超额后可升级至 Pages Pro 或 Workers Paid 计划获取更高额度。
+**A：** 免费额度每月 500 次构建。频繁构建可合并提交或仅在必要时部署，超额后可升级至 Pages Pro 或 Workers Paid 计划获取更高额度。
