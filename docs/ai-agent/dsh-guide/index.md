@@ -16,9 +16,9 @@ DeepSeek Harness（简称 **dsh**）是 DeepSeek 开源的一款 AI Agent 运行
 
 dsh 需要 **Node.js ≥ 22**，推荐使用 24+ LTS 版本。
 
-可前往查看我分享的 [Node.js 运行时](https://xiao-blog.top/share/?type=other&name=nodejs)，下载并安装最新版本。
+可前往查看我分享的 [Node.js](https://xiao-blog.top/share/?type=other&name=nodejs)，下载并安装最新版本。
 
-> Windows 用户懒人版安装教程：点击[此处](https://nodejs.org/dist/v24.19.0/node-v24.19.0-x64.msi)直接下载并安装即可
+> Windows 用户懒人版安装教程：点击[此处](https://nodejs.org/dist/v24.21.0/node-v24.21.0-x64.msi)直接下载并安装即可。
 
 ### 2. 安装 pnpm（插件管理必需）
 
