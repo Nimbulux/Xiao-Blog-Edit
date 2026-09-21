@@ -1,9 +1,4 @@
 [
-  { "id": "vscode", "title": "VSCode 相关技巧",
-    "children": [
-      { "id": "vscode-data-location", "title": "VSCode 配置文件位置" }
-    ]
-  },
   { "id": "linux-guide", "title": "Linux 相关指导及建议",
     "children": [
       { "id": "linux-install-guide", "title": "Linux 相关安装教程",
@@ -73,14 +68,6 @@
       { "id": "venv-guide", "title": "Venv 虚拟环境使用讲解" }
     ]
   },
-  { "id": "ai-agent", "title": "AI Agent 使用指南",
-    "children": [
-      { "id": "windows-agent-prompt", "title": "Windows AI Agent 提示词配置" },
-      { "id": "dsh-guide", "title": "DeepSeek Harness 使用与配置指南" },
-      { "id": "npm-question", "title": "Agent 工具链包管理器的安全策略障碍与解决方案" },
-      { "id": "agent-data-location", "title": "Agent 工具历史记录存储位置" }
-    ]
-  },
   { "id": "web-develop-guide", "title": "Web 开发相关指南及建议",
     "children": [
       { "id": "page-deploy-guide", "title": "静态页面部署教程",
@@ -94,6 +81,19 @@
           { "id": "qq-image-url", "title": "QQ 头像 URL 获取方法" }
         ]
       }
+    ]
+  },
+  { "id": "ai-agent", "title": "AI Agent 使用指南",
+    "children": [
+      { "id": "windows-agent-prompt", "title": "Windows AI Agent 提示词配置" },
+      { "id": "dsh-guide", "title": "DeepSeek Harness 使用与配置指南" },
+      { "id": "npm-question", "title": "Agent 工具链包管理器的安全策略障碍与解决方案" },
+      { "id": "agent-data-location", "title": "Agent 工具历史记录存储位置" }
+    ]
+  },
+  { "id": "vscode", "title": "VSCode 相关技巧",
+    "children": [
+      { "id": "vscode-data-location", "title": "VSCode 配置文件位置" }
     ]
   },
   { "id": "proxy", "title": "代理原理与工具使用",
