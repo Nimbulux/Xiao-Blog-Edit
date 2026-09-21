@@ -139,8 +139,8 @@ img { max-width: 100%; display: block; }
   font-weight: 700;
 }
 .site-nav .nav-item.active::after { width: calc(100% - 28px); }
-/* 低分辨率屏（devicePixelRatio ≤ 1，如 1K/1080p 屏 100% 缩放）下
-   2px 仅渲染为 2 物理像素，视觉偏细；提高到 3px 与高分屏观感一致 */
+
+/* 低分辨率屏高亮条修复 */
 @media (max-resolution: 1dppx) {
   .site-nav .nav-item::after { height: 3px; }
 }
@@ -206,7 +206,7 @@ img { max-width: 100%; display: block; }
 }
 .container.wide { max-width: 1280px; }
 
-/* ---------- 大卡片面板（包装区块） ---------- */
+/* ---------- 大卡片面板 ---------- */
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -234,7 +234,7 @@ img { max-width: 100%; display: block; }
   border-color: var(--link);
 }
 
-/* ---------- 卡片网格（项目 / Wiki / 好友共用） ---------- */
+/* ---------- 卡片网格（项目 / 文档 / 好友共用） ---------- */
 .project-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
