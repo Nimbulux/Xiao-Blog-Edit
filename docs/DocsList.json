@@ -25,6 +25,8 @@
     "children": [
       { "id": "git-basic-usage", "title": "Git 基础用法" },
       { "id": "git-remote-guide", "title": "Git 远程管理配置及用法" },
+      { "id": "git-lfs-guide", "title": "Git LFS 大文件管理介绍" },
+      { "id": "git-pr-guide", "title": "Git Pull Request 协作流程指南" },
       { "id": "git-ssh-guide", "title": "Git SSH 配置及使用建议",
         "children": [
           { "id": "git-ssh-config", "title": "Git SSH 配置方法" },
@@ -79,9 +81,13 @@
       { "id": "agent-data-location", "title": "Agent 工具历史记录存储位置" }
     ]
   },
-  { "id": "image-url", "title": "图片 URL 获取方式",
+  { "id": "web-develop-guide", "title": "Web 开发相关指南及建议",
     "children": [
-      { "id": "qq-image-url", "title": "QQ 头像直链接口" }
+      { "id": "image-url", "title": "图片 URL 获取方法",
+        "children": [
+          { "id": "qq-image-url", "title": "QQ 头像 URL 获取方法" }
+        ]
+      }
     ]
   },
   { "id": "proxy", "title": "代理原理与工具使用",
