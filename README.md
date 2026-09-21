@@ -1,6 +1,6 @@
 # Xiao-Blog
 
-个人技术博客站点，部署于 Cloudflare Pages。零构建零依赖，源码即产物。
+个人技术博客站点，部署于 Cloudflare Pages，**零构建零依赖，源码即产物**。
 
 在线访问：<https://xiao-blog.top>
 
@@ -11,7 +11,7 @@
 - **文档知识库**：多级目录树，支持 `docs/star.json` 精选文档
 - **星标分享库**：双数据源，支持 `?type=software|other&name=xxx` URL 双映射直达
 - **留言板**：Cloudflare D1 持久化，支持 Markdown 渲染
-- **好友页 / 关于页**：好友列表、站点统计、隐私政策
+- **好友页与关于页**：好友列表、站点统计、隐私政策
 - **RSS 订阅**：Edge Function 动态生成 RSS 2.0
 - **主题系统**：深浅色切换
 - **完整 SEO**：sitemap.xml / robots.txt / OG meta / Twitter Card / JSON-LD
@@ -33,7 +33,7 @@
 ├── index.html              # 首页
 ├── wrangler.toml           # Cloudflare Pages 配置
 ├── schema.sql              # 留言板 SQL 建表
-├── sitemap.xml / robots.txt
+├── robots.txt              # 网站爬虫协议
 ├── assets/
 │   ├── css/                # 页面样式
 │   ├── js/                 # 脚本
@@ -58,7 +58,9 @@
 wrangler pages dev .
 ```
 
-默认监听 `http://localhost:8788`。留言板 API 需要 D1 绑定，本地 dev 会自动读取 `wrangler.toml` 配置。
+默认监听 `http://localhost:8788`。
+
+> 留言板 API 需要 D1 绑定，本地 dev 会自动读取 `wrangler.toml` 配置。
 
 ## 部署
 

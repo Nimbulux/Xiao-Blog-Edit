@@ -1,8 +1,6 @@
 /* highlight.js 语法高亮主题：
-   适配 [data-theme] 深浅色切换；代码块背景由主题统一控制，覆盖 docs.css 的 --code-bg。*/
-
-.docs-content pre { background: #f6f8fa; }
-[data-theme="dark"] .docs-content pre { background: #0d1117; }
+   适配 [data-theme] 深浅色切换；代码块背景由 docs.css 的 --code-bg 统一控制
+   */
 
 /* ===== 浅色 ===== */
 .hljs { color: #24292e; }

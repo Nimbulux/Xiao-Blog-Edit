@@ -201,7 +201,7 @@ git push --force-with-lease
 
 ---
 
-## 最强懒人版总结
+## 最小流程总结
 
 同仓 PR 最小流程如下：
 
