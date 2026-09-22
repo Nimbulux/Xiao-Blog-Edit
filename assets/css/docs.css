@@ -282,7 +282,7 @@
   font-size: 14px;
   color: inherit;
 }
-.docs-sidebar .sidebar-group-active .sidebar-group-title {
+.docs-sidebar .sidebar-group-active > .sidebar-group-header > .sidebar-group-title {
   color: var(--link);
 }
 .docs-sidebar .sidebar-toggle {
