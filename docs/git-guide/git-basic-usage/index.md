@@ -179,7 +179,7 @@ git commit --amend --no-edit
 
 ```bash
 git log
-git log --oneline --graph ## 此为简洁视图，可以常用
+git log --oneline --graph # 此为简洁视图，可以常用
 ```
 
 `--oneline` 每条提交压成一行，`--graph` 以字符画出分支合并图，便于快速了解演进脉络。

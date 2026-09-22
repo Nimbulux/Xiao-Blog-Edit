@@ -80,5 +80,3 @@ py install --configure
 1.  **优先使用 Python Install Manager**：通过 `py install` 安装所有 Python 版本，通过 `py list` 和 `py uninstall` 统一管理，彻底告别 `.exe` 安装包的混乱。
 2.  **使用 `py -3.X` 选择版本**：始终使用 `py -3.X` 的形式来明确指定你要使用的 Python 版本。
 3.  **结合虚拟环境**：用 `py -3.11 -m venv myenv` 创建虚拟环境，精准锁定该环境使用的 Python 版本，可查看[我的博客](https://xiao-blog.top/docs/article?id=python-guide&sub=venv-guide)。
-
----

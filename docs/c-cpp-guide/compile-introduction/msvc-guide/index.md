@@ -43,7 +43,7 @@ cl /EHsc hello.cpp
 
 ### 多文件编译
 
-```cmd
+```powershell
 cl /EHsc /Fe:myapp.exe main.cpp utils.cpp
 ```
 

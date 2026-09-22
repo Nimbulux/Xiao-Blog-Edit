@@ -182,7 +182,7 @@ Component.prototype.createOperations = function()
 
 ## 生成安装包
 
-安装 QIFW 后（可从 QT MaintenanceTool 下载最新版本），找到其路径，使用 `binarycreator` 工具生成安装程序：
+安装 QIFW 后（可从 Qt MaintenanceTool 下载最新版本），找到其路径，使用 `binarycreator` 工具生成安装程序：
 
 - **Windows 使用 Powershell 生成**
 

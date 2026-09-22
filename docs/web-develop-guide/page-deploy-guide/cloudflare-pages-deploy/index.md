@@ -226,7 +226,7 @@ Wrangler CLI 可集成到任意 CI/CD 平台。推荐使用 API Token 而非交�
 
 ### Q：Functions 不生效
 
-**A：** 确认 Edge Fuctions 函数文件位于仓库的 `functions/` 目录下，且文件名符合路由约定。Wrangler 部署时 `pages_build_output_dir` 应指向含 `functions/` 的项目根目录，而非仅构建产物目录！
+**A：** 确认 Edge Functions 函数文件位于仓库的 `functions/` 目录下，且文件名符合路由约定。Wrangler 部署时 `pages_build_output_dir` 应指向含 `functions/` 的项目根目录，而非仅构建产物目录！
 
 > 本人已经遇上过这样的情况，请严格注意函数文件位置！
 

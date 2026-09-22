@@ -61,7 +61,7 @@ git push -u origin feature/add-login-page
 - **标题**：简明描述本次改动，建议遵循约定式提交前缀。
 - **描述**：说明改动动机、实现思路、测试方式。
 - **评审人**：指定审查者，会发送通知。
-- **标签*：按团队约定打标签，如 `needs-review`、`bug`。
+- **标签**：按团队约定打标签，如 `needs-review`、`bug`。
 
 点击 `Create pull request` 即完成发起。
 

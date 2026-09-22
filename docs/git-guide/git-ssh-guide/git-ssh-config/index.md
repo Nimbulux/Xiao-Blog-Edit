@@ -44,7 +44,7 @@ Host <别名>
 
 ```text
 Host github.com
-    Hostname ssh.github.com
+    HostName github.com
     User git
     IdentityFile ~/.ssh/id_ed25519
 ```
@@ -165,3 +165,5 @@ Host github.com
     Port 443
     IdentityFile ~/.ssh/github/id_ed25519
 ```
+
+> 需要将 `HostName` 改为 `ssh.github.com` 而不是之前的 `github.com`。

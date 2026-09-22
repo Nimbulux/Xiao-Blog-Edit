@@ -76,7 +76,7 @@ sudo apt install nvidia-driver-565-open
 
 - 包名中的版本号按需替换，可用 `apt search 'nvidia-driver-.*-open'` 查看可用版本；
 - Secure Boot 场景同样需要 MOK 签名；
-- 建议优先使用 `open` 版本保证能驱动程序能安装上，后续可装闭源版。
+- 建议优先使用 `open` 版本保证驱动程序能安装上，后续可装闭源版。
 
 无论什么办法，只要重启后输入 `nvidia-smi`，终端输出能看到显卡型号、驱动版本、显存信息，就代表安装成功。
 

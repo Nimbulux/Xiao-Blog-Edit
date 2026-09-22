@@ -53,12 +53,12 @@ sync # 处理并弹出
 
 ## 从 U 盘启动
 
-- 将 U 盘插入目标机器，开机时需快速按相关案按键进入 BIOS（常见为 `F2`、`F12`、`Del`，因主板而异）。
-- 在 BIOS 启动菜单中选择 U 盘项提升至最顶（UEFI 模式下 U 盘启动项通常带 `UEFI:` 前缀，有 `Hard Driver` 等字符）。
+- 将 U 盘插入目标机器，开机时需快速按相关按键进入 BIOS（常见为 `F2`、`F12`、`Del`）。
+- 在 BIOS 启动菜单中选择 U 盘项提升至最顶（UEFI 模式下 U 盘启动项通常带 `UEFI:` 前缀，有 `Hard Drive` 等字符）。
 - 进入 Ubuntu 安装界面后，选择 `Try or Install Ubuntu`。
 
 **这里有几个坑点，一定要注意！**：
-- Windows 用户需要在控制面版关掉 `快速启动`，尤其是想装 Windows 与 Linux 双系统的，因为它在关机时并没有完全关机（嗯对并没有真关机）。
+- Windows 用户需要在控制面板关掉 `快速启动`，尤其是想装 Windows 与 Linux 双系统的，因为它在关机时并没有完全关机（嗯对并没有真关机）。
 - Windows 用户如果给磁盘启用了 BitLocker 锁，需要先进行解锁，否则会出现数据丢失问题（如果你不需要 Windows 数据可忽略）。
 - BIOS 设置内最好关闭 `Secure Boot`，否则可能出现引导错误问题。
 - 如果电脑有核显，请在设置选择只启用核显或者自动切换，否则可能因为独显驱动不兼容导致界面黑屏等问题。
@@ -73,13 +73,13 @@ sync # 处理并弹出
 - **键盘布局**：根据实际键盘选择，一般不需要过多设置；
 - **安装类型**：
     - **Erase disk and install Ubuntu**：清盘安装，将整块磁盘交给 Ubuntu。
-    - **Install alongside Windows**：与 Windows共存，自动分区，保留原系统。
+    - **Install alongside Windows**：与 Windows 共存，自动分区，保留原系统。
     - **Something else**：手动分区方案，推荐能力更强的用户使用。
 - **手动分区（后续补教程，建议使用前两种安装类型）**：
 
     | 挂载点 | 大小 | 文件系统 | 用途 |
     | :--- | :--- | :--- | :--- |
-    | `/boot/efi` | 512MB | EFI System Partition | EFI 引导分区|
+    | `/boot/efi` | 512MB | EFI System Partition | EFI 引导分区 |
     | `/` | 30GB+ | ext4 | 根分区，系统文件 |
 
     > **双系统注意**：EFI 分区若已存在（例如原 Windows 用户），**不要新建**，直接挂载到 `/boot/efi` 即可，避免破坏原引导。
