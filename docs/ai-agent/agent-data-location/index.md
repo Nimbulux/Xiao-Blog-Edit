@@ -18,4 +18,4 @@
 
 ---
 
-对于SQLite数据库，可以使用我分享的 [SQLite Browser](https://xiao-blog.top/share/?type=software&name=db-browser-sqlite) 工具查看。
+对于 SQLite 数据库，可以使用我分享的 [SQLite Browser](https://xiao-blog.top/share/?type=software&name=db-browser-sqlite) 工具查看。

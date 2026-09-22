@@ -160,7 +160,7 @@ Are you sure you want to continue connecting (yes/no)?
 
 ```text
 Host github.com
-    Hostname ssh.github.com
+    HostName ssh.github.com
     User git
     Port 443
     IdentityFile ~/.ssh/github/id_ed25519

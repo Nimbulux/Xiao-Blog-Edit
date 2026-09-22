@@ -58,7 +58,7 @@ my_projects/
     <WizardDefaultWidth>880px</WizardDefaultWidth>
     <WizardDefaultHeight>480px</WizardDefaultHeight>
     <Title>软件安装器页面标题（如软件名字 + Installer）</Title>
-    <Publisher>公司组织或个人名字（如GitHub-ckckh2023）</Publisher>
+    <Publisher>公司组织或个人名字（如 GitHub-ckckh2023）</Publisher>
     <StartMenuDir>系统开始菜单页面显示名字（最好与软件名字保持一致）</StartMenuDir>
     <TargetDir>@ApplicationsDir@/软件名字</TargetDir>
 </Installer>

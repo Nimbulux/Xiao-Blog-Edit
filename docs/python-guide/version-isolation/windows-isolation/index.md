@@ -6,7 +6,7 @@
 
 ## 首选方案：Python Install Manager（官方推荐）
 
-**Python Install Manager** 是 Python 官方团队为 Windows 平台打造的**新一代 Python 安装与版本管理工具**。它统一了安装 Python和管理多个 Python 版本这两个功能，是未来 Python 在 Windows 上的主流安装方式。
+**Python Install Manager** 是 Python 官方团队为 Windows 平台打造的**新一代 Python 安装与版本管理工具**。它统一了安装 Python 和管理多个 Python 版本这两个功能，是未来 Python 在 Windows 上的主流安装方式。
 
 > **重要提示**：从 **Python 3.16** 开始，传统的独立 `.exe` 安装包将停止发布。因此，**现在就迁移到 Python Install Manager 是最明智的选择**。
 

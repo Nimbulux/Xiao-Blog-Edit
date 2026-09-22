@@ -134,7 +134,7 @@ dsh plugin --profile <profile名称> add <插件包名>
 
 | 插件 | 功能 |
 |------|------|
-| **dshmarket** | DeepSeek插件市场 |
+| **dshmarket** | DeepSeek 插件市场 |
 | **dsh-better-sidebar** | Web UI 右侧工作区面板 |
 | **@linxin666/dsh-remote-web-ui** | 手机局域网访问 Web UI |
 | **@ychris12138/dsh-usage-stats** | Token 额度使用面板 |

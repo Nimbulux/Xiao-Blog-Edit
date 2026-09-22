@@ -54,7 +54,7 @@ sync # 处理并弹出
 ## 从 U 盘启动
 
 - 将 U 盘插入目标机器，开机时需快速按相关按键进入 BIOS（常见为 `F2`、`F12`、`Del`）。
-- 在 BIOS 启动菜单中选择 U 盘项提升至最顶（UEFI 模式下 U 盘启动项通常带 `UEFI:` 前缀，有 `Hard Drive` 等字符）。
+- 在 BIOS 启动菜单中选择 U 盘项调整到最顶层（UEFI 模式下 U 盘启动项通常带 `UEFI:` 前缀，有 `Hard Drive` 等字符）。
 - 进入 Ubuntu 安装界面后，选择 `Try or Install Ubuntu`。
 
 **这里有几个坑点，一定要注意！**：
