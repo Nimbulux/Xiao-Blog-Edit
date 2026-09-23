@@ -1,9 +1,9 @@
 /* ============================================================
-   share.css - 星标分享卡片样式
-   加载页面：/share/index.html
+   share.css - 分享页样式
+   加载页面：/index.html、/share/index.html
    ============================================================ */
 
-/* ---------- 左侧栏 + 右侧内容 布局 ---------- */
+/* ---------- 左侧选择栏与右侧内容布局 ---------- */
 .share-layout {
   display: grid;
   grid-template-columns: 260px 1fr;
@@ -199,7 +199,7 @@
 .share-card .sc-status-unknown { background: #d29922; }
 .share-card .sc-status-deprecated { background: #d1242f; }
 
-/* 头部：图标 + 名称 */
+/* 卡片头部的图标和名称 */
 .share-card .sc-header {
   display: flex;
   align-items: center;
@@ -249,7 +249,7 @@
   min-height: 44px;
 }
 
-/* 平台图标 + 标签元信息区 */
+/* 平台图标和标签元信息区 */
 .share-card .sc-meta {
   display: flex;
   align-items: center;
@@ -300,7 +300,7 @@
   border-radius: 999px;
 }
 
-/* 底部按钮区：左下角主页+相关文档，右下角下载 */
+/* 底部按钮区样式 */
 .share-card .sc-actions {
   display: flex;
   align-items: center;
@@ -403,7 +403,7 @@
   word-break: break-all;
 }
 
-/* ---------- 响应式：窄屏侧边栏置顶 ---------- */
+/* ---------- 响应式窄屏侧边栏置顶 ---------- */
 @media (max-width: 900px) {
   .share-layout { grid-template-columns: 1fr; }
   .share-sidebar {

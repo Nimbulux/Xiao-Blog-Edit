@@ -1,8 +1,6 @@
 /* ============================================================
-   share.js - 分享页专属逻辑
-   功能：分享列表加载、星标卡片渲染、相关文档/下载选择弹窗
-   依赖：common.js（Utils / root）
-   加载页面：/share/index.html
+   share.js - 分享页逻辑
+   加载页面：/index.html、/share/index.html
    ============================================================ */
 
 (function (global) {
@@ -11,7 +9,7 @@
   var utils = global.Utils;
   var root = global.root;
 
-  /* 软件列表（格式见 /share/example.json） */
+  /* 软件列表 */
   function fetchShareList() {
     return utils.fetchJSON(root() + "share/SoftWareList.json").then(function (list) {
       return Array.isArray(list) ? list : [];
@@ -22,7 +20,7 @@
   }
   global.fetchShareList = fetchShareList;
 
-  /* 其他列表（格式见 /share/example.json） */
+  /* 其他列表 */
   function fetchOtherList() {
     return utils.fetchJSON(root() + "share/OtherList.json").then(function (list) {
       return Array.isArray(list) ? list : [];
@@ -33,7 +31,7 @@
   }
   global.fetchOtherList = fetchOtherList;
 
-  /* ---------- 状态 LED ---------- */
+  /* ---------- 状态显示 ---------- */
   function statusInfo(s) {
     if (s === "active") return { cls: "sc-status-active", label: "活跃更新中" };
     if (s === "deprecated") return { cls: "sc-status-deprecated", label: "已停更/已废弃" };
@@ -49,11 +47,10 @@
     "Android": '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.4395 5.5586c-.675 1.1664-1.352 2.3318-2.0274 3.498-.0366-.0155-.0742-.0286-.1113-.043-1.8249-.6957-3.484-.8-4.42-.787-1.8551.0185-3.3544.4643-4.2597.8203-.084-.1494-1.7526-3.021-2.0215-3.4864a1.1451 1.1451 0 0 0-.1406-.1914c-.3312-.364-.9054-.4859-1.379-.203-.475.282-.7136.9361-.3886 1.5019 1.9466 3.3696-.0966-.2158 1.9473 3.3593.0172.031-.4946.2642-1.3926 1.0177C2.8987 12.176.452 14.772 0 18.9902h24c-.119-1.1108-.3686-2.099-.7461-3.0683-.7438-1.9118-1.8435-3.2928-2.7402-4.1836a12.1048 12.1048 0 0 0-2.1309-1.6875c.6594-1.122 1.312-2.2559 1.9649-3.3848.2077-.3615.1886-.7956-.0079-1.1191a1.1001 1.1001 0 0 0-.8515-.5332c-.5225-.0536-.9392.3128-1.0488.5449zm-.0391 8.461c.3944.5926.324 1.3306-.1563 1.6503-.4799.3197-1.188.0985-1.582-.4941-.3944-.5927-.324-1.3307.1563-1.6504.4727-.315 1.1812-.1086 1.582.4941zM7.207 13.5273c.4803.3197.5506 1.0577.1563 1.6504-.394.5926-1.1038.8138-1.584.4941-.48-.3197-.5503-1.0577-.1563-1.6504.4008-.6021 1.1087-.8106 1.584-.4941z"/></svg>',
     "iOS": '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>'
   };
-  /* 导出供 /share/index.html 侧边栏平台筛选按钮复用 */
+  /* 导出供侧边栏平台筛选按钮复用 */
   global.PLATFORM_ICONS = PLATFORM_ICONS;
 
-  /* ---------- 主按钮：优先主页，次仓库，都没有则灰色 ----------
-     URL 可能是 null / 空串 / 字符串 "null"，统一视为不存在 */
+  /* ---------- 主按钮原则为优先主页，次仓库，都没有则不可点击 ---------- */
   function isRealUrl(u) {
     return !!u && typeof u === "string" && u !== "null" && u.trim() !== "";
   }
@@ -69,19 +66,17 @@
     return '<button class="btn disabled" type="button" disabled>访问主页</button>';
   }
 
-  /* 相关文档按钮（blogs 非空才渲染） */
+  /* 相关文档按钮 */
   function docsBtn(idx) {
     return '<button class="btn" type="button" data-action="blogs" data-index="' + idx + '">相关文档</button>';
   }
 
-  /* 下载按钮（installType 非空才渲染） */
+  /* 下载按钮 */
   function downloadBtn(idx) {
     return '<button class="btn" type="button" data-action="install" data-index="' + idx + '">下载</button>';
   }
 
-  /* ---------- 选择弹窗 ----------
-     title: 弹窗标题；items: [{ title, url }]
-     点击选择项跳转 url（新窗口）；点遮罩空白 / 关闭按钮 / ESC 关闭 */
+  /* ---------- 选择弹窗 ---------- */
   function openSelectDialog(title, items) {
     var old = document.getElementById("sc-dialog");
     if (old) old.remove();
@@ -115,7 +110,7 @@
     document.addEventListener("keydown", onKey);
   }
 
-  /* 多元素按钮处理：1 个直接跳转，多个弹窗 */
+  /* 多元素按钮处理 */
   function handleMulti(arr, title) {
     if (!Array.isArray(arr) || !arr.length) return;
     if (arr.length === 1) {
@@ -132,7 +127,7 @@
     var desc = utils.escapeHTML(item.description || "");
     var st = statusInfo(item.status);
 
-    /* 图标节点：有 iconUrl 用 img（onerror 回退首字母方块）；无则直接首字母方块 */
+    /* 图标节点 */
     var iconNode;
     if (isRealUrl(item.iconUrl)) {
       iconNode =
@@ -144,7 +139,7 @@
       iconNode = '<div class="sc-icon-fallback">' + utils.escapeHTML(initial) + "</div>";
     }
 
-    /* 平台图标行：展示 platforms 数组对应的 SVG 图标 */
+    /* 平台图标行 */
     var platformsHTML = "";
     if (Array.isArray(item.platforms) && item.platforms.length) {
       platformsHTML = '<div class="sc-platforms">' +
@@ -154,7 +149,7 @@
         }).join("") + "</div>";
     }
 
-    /* 标签：仅展示 tags 数组，category（software/other）不在卡片上展示 */
+    /* 标签 */
     var tagsHTML = "";
     if (Array.isArray(item.tags) && item.tags.length) {
       tagsHTML = '<div class="sc-tags">' +
@@ -163,14 +158,13 @@
         }).join("") + "</div>";
     }
 
-    /* 平台与标签合并为一行，中间用 | 分隔 */
     var metaHTML = "";
     if (platformsHTML || tagsHTML) {
       var sep = (platformsHTML && tagsHTML) ? '<span class="sc-meta-sep">|</span>' : "";
       metaHTML = '<div class="sc-meta">' + platformsHTML + sep + tagsHTML + "</div>";
     }
 
-    /* 左下角：访问主页 + 相关文档（blogs 非空才显示）；右下角：下载（installType 非空才显示） */
+    /* 左下角显示逻辑 */
     var docsHTML = (Array.isArray(item.blogs) && item.blogs.length) ? docsBtn(idx) : "";
     var dlHTML = (Array.isArray(item.installType) && item.installType.length) ? downloadBtn(idx) : "";
 
@@ -202,8 +196,7 @@
     }
     box._shareItems = items; /* 供事件委托读取，每次渲染刷新 */
     var cls = "project-grid project-grid-" + (perRow || 2);
-    box.innerHTML = '<div class="' + cls + '">' +
-      items.map(function (item, idx) { return shareCardHTML(item, idx); }).join("") + "</div>";
+    box.innerHTML = '<div class="' + cls + '">' + items.map(function (item, idx) { return shareCardHTML(item, idx); }).join("") + "</div>";
 
     /* 事件委托仅绑定一次，避免重渲染累积监听器 */
     if (!box._shareBound) {

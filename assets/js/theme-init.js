@@ -1,4 +1,6 @@
-/* theme-init.js - 在 <head> 最早加载，避免深色模式首屏闪白（FOUC） */
+/* ============================================================
+   theme-init.js - 主题初始化逻辑
+   ============================================================ */
 (function () {
   try {
     var t = localStorage.getItem("theme");
@@ -8,7 +10,8 @@
         ? "dark" : "light";
     }
     document.documentElement.setAttribute("data-theme", t);
-  } catch (e) {
+  }
+  catch (e) {
     document.documentElement.setAttribute("data-theme", "light");
   }
 })();

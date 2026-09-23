@@ -1,7 +1,6 @@
 /* ============================================================
    home.js - 首页专属逻辑
-   功能：GitHub 用户信息加载、精选文档 卡片渲染、精选留言卡片渲染
-   依赖：common.js（Utils / fetchGitHubJSON / root）+ marked + DOMPurify（留言正文 Markdown）
+   加载页面：/index.html
    ============================================================ */
 
 (function (global) {
@@ -14,9 +13,7 @@
   var GITHUB_HOME = global.GITHUB_HOME;
   var fetchGitHubJSON = global.fetchGitHubJSON;
 
-  /* ---------- GitHub 用户信息 ----------
-     与仓库卡片（repo.js enrichProject）行为一致：本地数据优先，
-     GitHub API 只在可用时后台覆盖更新 */
+  /* ---------- GitHub 用户信息 ---------- */
   var FALLBACK_PROFILE = {
     name: "Xander Xiao",
     bio: "没招了没招了没招了",
@@ -26,7 +23,7 @@
     public_repos: 7
   };
 
-  /* 本地数据（高优）：直接返回内置 FALLBACK_PROFILE，页面秒开 */
+  /* 本地数据高优先级 */
   function fetchLocalProfile() {
     var p = Object.assign({}, FALLBACK_PROFILE);
     p.avatar = GITHUB_AVATAR;
@@ -35,7 +32,7 @@
   }
   global.fetchLocalProfile = fetchLocalProfile;
 
-  /* GitHub API 更新：成功返回最新数据覆盖本地；断流/限流/报错返回 null 保留本地 */
+  /* GitHub API 更新 */
   function fetchGitHubProfile() {
     return fetchGitHubJSON(GITHUB_API, "profile").then(function (data) {
       var p = {
@@ -56,7 +53,7 @@
   }
   global.fetchGitHubProfile = fetchGitHubProfile;
 
-  /* ---------- 精选文档 数据加载 ---------- */
+  /* ---------- 精选文档数据加载 ---------- */
   function fetchStarDocs() {
     return utils.fetchJSON(root() + "docs/star.json").then(function (list) {
       return Array.isArray(list) ? list : [];
@@ -67,7 +64,7 @@
   }
   global.fetchStarDocs = fetchStarDocs;
 
-  /* ---------- 精选分享 数据加载 ---------- */
+  /* ---------- 精选分享数据加载 ---------- */
   function fetchStarShares() {
     return utils.fetchJSON(root() + "share/star.json").then(function (list) {
       return Array.isArray(list) ? list : [];
@@ -78,11 +75,10 @@
   }
   global.fetchStarShares = fetchStarShares;
 
-  /* ---------- 精选文档 卡片渲染（纯 DOM） ----------
+  /* ---------- 精选文档卡片渲染 ----------
      selector: 挂载点选择器
-     list:     精选 wiki 数组 [{ url, title, excerpt }]
-     perRow:   每行列数（默认 2）
-  ---------- */
+     list:     精选文档数组
+     perRow:   每行列数 */
   function wikiCardHTML(item) {
     var href = utils.escapeHTML(item.url || "#");
     return '<article class="card wiki-card">' +
@@ -108,9 +104,7 @@
   }
   global.mountWikiCards = mountWikiCards;
 
-  /* ---------- 精选留言数据加载 ----------
-     guestbook/star.json 存放精选留言的 id 数组，例如：[1, 5, 12]
-     渲染时按 id 调 /api/guestbook?ids= 从 D1 数据库批量获取。 */
+  /* ---------- 精选留言数据加载 ---------- */
   function fetchStarGuestbook() {
     return utils.fetchJSON(root() + "guestbook/star.json").then(function (list) {
       return Array.isArray(list) ? list : [];
@@ -121,11 +115,9 @@
   }
   global.fetchStarGuestbook = fetchStarGuestbook;
 
-  /* 卡片渲染复用 gb-card.js 的 window.GBCard */
-
-  /* 精选留言卡片渲染（纯 DOM）
+  /* 精选留言卡片渲染
      selector: 挂载点选择器
-     list:     star.json 内容（留言 id 数字数组） */
+     list:     star.json 内容 */
   function mountGuestbookCards(selector, list) {
     var box = document.querySelector(selector);
     if (!box) return;
@@ -144,8 +136,7 @@
         box.innerHTML = '<div class="status-box">精选留言加载失败，请稍后重试。</div>';
         return;
       }
-      box.innerHTML = '<div class="guestbook-wall">' +
-        valid.map(global.GBCard.gbCardHTML).join("") + "</div>";
+      box.innerHTML = '<div class="guestbook-wall">' + valid.map(global.GBCard.gbCardHTML).join("") + "</div>";
       global.GBCard.setupClamp(box);
     }).catch(function () {
       box.innerHTML = '<div class="status-box">精选留言加载失败，请稍后重试。</div>';

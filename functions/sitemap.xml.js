@@ -1,8 +1,7 @@
-/* functions/sitemap.xml.js
-   动态生成 sitemap → /sitemap.xml
-   读取 /docs/DocsList.json，递归遍历所有节点，
-   仅包含实际存在 index.md 的文章（HEAD 探测）。
-   叠加静态栏目页（首页、各栏目入口、rss.xml）。 */
+/* ============================================================
+   functions/sitemap.xml.js - 动态生成站点地图
+   路由：/sitemap.xml
+   ============================================================ */
 const SITE = "https://xiao-blog.top";
 const DOCS = "/docs/";
 
@@ -33,7 +32,7 @@ function escapeXML(s) {
     .replace(/"/g, "&quot;");
 }
 
-/* 静态栏目页：loc / changefreq / priority */
+/* 静态栏目页 */
 var STATIC_PAGES = [
   { loc: "/", changefreq: "weekly", priority: "1.0" },
   { loc: "/docs/", changefreq: "weekly", priority: "0.9" },
@@ -53,7 +52,8 @@ export async function onRequestGet(context) {
     try {
       var resp = await env.ASSETS.fetch(new Request(SITE + DOCS + "DocsList.json"));
       if (resp.ok) list = await resp.json();
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   var nodes = [];

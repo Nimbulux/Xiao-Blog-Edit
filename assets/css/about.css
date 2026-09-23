@@ -57,7 +57,7 @@
   margin: 4px 0 0;
 }
 
-/* ---------- 站点信息 dl ---------- */
+/* ---------- 站点信息 ---------- */
 .about-info-list {
   margin: 0;
 }
@@ -75,7 +75,7 @@
   margin: 4px 0 0;
 }
 
-/* ---------- 双列卡片布局（统计下方：联系方式|RSS，赞赏|隐私） ---------- */
+/* ---------- 双列卡片布局 ---------- */
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -106,7 +106,7 @@
   text-decoration: none;
 }
 .about-contact-list a:hover { text-decoration: underline; }
-/* 待补充的占位链接（如知乎 / CSDN 主页） */
+/* 待补充的占位链接 */
 .about-contact-list a.about-pending {
   color: var(--text-muted);
 }

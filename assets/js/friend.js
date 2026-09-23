@@ -1,7 +1,5 @@
 /* ============================================================
    friend.js - 好友页专属逻辑
-   功能：好友列表加载、好友卡片渲染
-   依赖：common.js（Utils / root）
    加载页面：/friend/index.html
    ============================================================ */
 
@@ -11,7 +9,7 @@
   var utils = global.Utils;
   var root = global.root;
 
-  /* 好友列表（格式：[{ id, avatar?, bio, url }]，avatar 缺失时以 ID 首字母占位） */
+  /* 好友列表 */
   function fetchFriendList() {
     return utils.fetchJSON(root() + "friend/FriendList.json").then(function (list) {
       return Array.isArray(list) ? list : [];
@@ -22,19 +20,18 @@
   }
   global.fetchFriendList = fetchFriendList;
 
-  /* ---------- 好友卡片渲染（纯 DOM） ----------
+  /* ---------- 好友卡片渲染 ----------
      selector: 挂载点选择器
-     list:     好友数组 [{ id, avatar?, bio, url }]
-     perRow:   每行列数（默认 2）
-     头像缺失时以 ID 首字母占位；头像加载失败时回退到首字母占位。
-  ---------- */
+     list:     好友数组
+     perRow:   每行列数
+     头像缺失时以 ID 首字母占位，且头像加载失败时回退到首字母占位。*/
   function friendCardHTML(item) {
     var id = item.id || "";
     var initial = (id.charAt(0) || "?").toUpperCase();
     var bio = utils.escapeHTML(item.bio || "");
     var url = utils.escapeHTML(item.url || "#");
 
-    /* 头像节点：有 avatar 用 img；无 avatar 直接首字母圆 */
+    /* 头像节点 */
     var avatarNode;
     if (item.avatar) {
       avatarNode =
@@ -42,9 +39,8 @@
           utils.escapeHTML(id) + '" ' +
           'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
         '<div class="fc-avatar-fallback" style="display:none">' + utils.escapeHTML(initial) + "</div>";
-    } else {
-      avatarNode = '<div class="fc-avatar-fallback">' + utils.escapeHTML(initial) + "</div>";
     }
+    else avatarNode = '<div class="fc-avatar-fallback">' + utils.escapeHTML(initial) + "</div>";
 
     return '<article class="card friend-card">' +
       '<div class="fc-header">' + avatarNode +

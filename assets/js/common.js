@@ -1,8 +1,6 @@
 /* ============================================================
    common.js - 全局共享逻辑
-   功能：导航栏渲染 / 高亮、主题切换、GitHub API 基础设施、
-         公告条、工具函数、版权年份
-   各页面专属逻辑请见 home.js / repo.js / docs.js / friend.js
+   各页面专属逻辑请见各 JS 文件
    ============================================================ */
 
 (function (global) {
@@ -16,7 +14,7 @@
   var GITEE_HOME = "https://gitee.com/" + GITHUB_USER;
   var GITCODE_HOME = "https://gitcode.com/" + GITHUB_USER;
 
-  /* 根路径（用户页站点部署在域名根目录） */
+  /* 根路径 */
   function root() { return "/"; }
   global.root = root;
 
@@ -28,8 +26,7 @@
       Object.keys(attrs).forEach(function (k) {
         if (k === "class") node.className = attrs[k];
         else if (k === "html") node.innerHTML = attrs[k];
-        else if (k.slice(0, 2) === "on" && typeof attrs[k] === "function")
-          node.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
+        else if (k.slice(0, 2) === "on" && typeof attrs[k] === "function") node.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
         else node.setAttribute(k, attrs[k]);
       });
     }
@@ -55,10 +52,9 @@
   var utils = new Utils();
   global.Utils = utils;
 
-  /* ---------- localStorage 缓存（GitHub API 数据） ----------
-     配合 GitHub REST API 的 ETag 条件请求（If-None-Match）：
-     数据未变化时返回 304（不计入速率限制），变化时返回 200 并更新缓存，
-     因此每次访问都能拿到最新数据，又不会耗尽 API 配额；
+  /* ---------- localStorage 缓存 ----------
+     配合 GitHub REST API 的 ETag 条件请求；
+     数据未变化时返回 304，变化时返回 200 并更新缓存；
      缓存仅在离线 / 限流 / 接口报错时作为兜底。 */
   var CACHE_PREFIX = "gh_cache:";
 
@@ -68,46 +64,48 @@
       if (!raw) return undefined;
       var obj = JSON.parse(raw);
       return (obj && typeof obj === "object" && "d" in obj) ? obj : undefined;
-    } catch (e) { return undefined; }
+    }
+    catch (e) { return undefined; }
   }
   function cacheWrite(key, entry) {
     try {
       localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(entry));
-    } catch (e) {}
+    }
+    catch (e) {}
   }
   function cacheClear() {
     try {
       Object.keys(localStorage).forEach(function (k) {
         if (k.indexOf(CACHE_PREFIX) === 0) localStorage.removeItem(k);
       });
-    } catch (e) {}
+    }
+    catch (e) {}
   }
   global.cacheClear = cacheClear;
 
-  /* ---------- 公告条（通用接口） ----------
+  /* ---------- 公告条 ----------
      showNotice(message, options)：在顶栏下方弹出公告
-       message:  公告文本（纯文本，会自动转义）
-       options.level       公告类型，默认 "warn"（黄色警示样式），预留其他类型
+       message:  公告文本
+       options.level       公告类型，默认 "warn"
        options.closable    是否显示红色 X 关闭按钮，默认 true
-       options.autoHide    自动关闭毫秒数，0=不自动关闭
-       options.onClose     关闭时回调（用户点 X 或自动隐藏后触发）
-       options.link        点击公告文本跳转的 URL，不传则不可点击跳转（默认不启用）
-       options.linkTarget  跳转 target，默认 "_blank"（新开）；为 "_blank" 时自动加 rel="noopener noreferrer"
-     返回关闭函数；后续其他场景（如站点公告）可直接复用该接口。 */
+       options.autoHide    自动关闭毫秒数，0 = 不自动关闭
+       options.onClose     关闭时回调
+       options.link        点击公告文本跳转的 URL，默认不启用
+       options.linkTarget  跳转 target，默认 "_blank"；为 "_blank" 时自动加 rel="noopener noreferrer"
+     返回关闭函数；后续其他场景可直接复用该接口。 */
   function showNotice(message, options) {
     var body = document.body;
     if (!body || !message) return function () {};
     var opts = Object.assign({ level: "warn", closable: true, autoHide: 0, linkTarget: "_blank" }, options || {});
 
     var bar = utils.el("div", { class: "notice-bar notice-bar-" + opts.level, role: "alert" });
-    /* 公告文本：有 link 时用 <a> 支持点击跳转（原生链接语义，中键/右键均可用）；无 link 时用 <span> 保持原样 */
+    /* 公告文本：有 link 时用 <a> 支持点击跳转；无 link 时用 <span> 保持原样 */
     if (opts.link) {
       var linkAttrs = { class: "notice-text notice-text-link", href: opts.link, target: opts.linkTarget };
       if (opts.linkTarget === "_blank") linkAttrs.rel = "noopener noreferrer";
       bar.appendChild(utils.el("a", linkAttrs, message));
-    } else {
-      bar.appendChild(utils.el("span", { class: "notice-text" }, message));
     }
+    else bar.appendChild(utils.el("span", { class: "notice-text" }, message));
 
     var closed = false;
     var close = function () {
@@ -133,7 +131,7 @@
   }
   global.showNotice = showNotice;
 
-  /* GitHub API 不可用时提醒一次；用户手动关闭后本机不再弹出（localStorage 持久化） */
+  /* GitHub API 不可用时提醒一次；用户手动关闭后本机不再弹出 */
   var GH_NOTICE_KEY = "gh_notice_dismissed";
   function ghNoticeDismissed() {
     try { return localStorage.getItem(GH_NOTICE_KEY) === "1"; } catch (e) { return false; }
@@ -150,10 +148,11 @@
     });
   }
 
-  /* 带 ETag 条件请求的 GitHub API 获取：
-     有缓存时带 If-None-Match 重新校验；304 复用缓存并刷新时间戳；
-     200 更新缓存并记录新 ETag；离线 / 限流 / 报错时回退缓存
-     extraHeaders：可选，追加到请求头（如 OAuth client 认证头，用于提高速率上限） */
+  /* 带 ETag 条件请求的 GitHub API 获取
+     有缓存时带 If-None-Match 重新校验；
+     304 复用缓存并刷新时间戳；
+     200 更新缓存并记录新 ETag；
+     离线 / 限流 / 报错时回退缓存 */
   function fetchGitHubJSON(url, key, extraHeaders) {
     var entry = cacheRead(key);
     var headers = {};
@@ -174,7 +173,6 @@
         return json;
       });
     }).catch(function (err) {
-      /* 网络异常 / 服务端 5xx / 限流(403,429) → 视为 GitHub API 不可用，弹公告提醒 */
       if (!err.status || err.status >= 500 || err.status === 403 || err.status === 429) {
         notifyGitHubIssues();
       }
@@ -187,7 +185,7 @@
   }
   global.fetchGitHubJSON = fetchGitHubJSON;
 
-  /* 暴露常量给子模块（避免重复硬编码） */
+  /* 暴露常量给子模块 */
   global.GITHUB_USER = GITHUB_USER;
   global.GITHUB_AVATAR = GITHUB_AVATAR;
   global.GITHUB_HOME = GITHUB_HOME;
@@ -252,7 +250,6 @@
     '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
     '<path d="m15.585 4.586l.486-.274q.032.17.06.303c.032.158.06.289.072.418c.103 1.118.665 1.941 1.462 2.127c1.165.27 2.264-.177 2.856-1.164c.711-1.184.403-2.634-.808-3.507C16.346.061 12.647-.609 8.663.56C.072 3.095-2.867 13.65 3.23 20.122c2.608 2.769 5.92 3.964 9.68 3.873c4.817-.113 8.285-2.513 10.5-6.674c1.57-2.952-.137-6.178-3.405-6.849a21 21 0 0 0-5.675-.362a4.8 4.8 0 0 0-1.805.548c-.625.325-.805.998-.735 1.666c.065.608.531.972 1.086 1.064c1.118.175 2.25.277 3.378.37c.327.027.657.03.986.033c.473.005.944.01 1.405.086c1.314.217 1.766 1.284 1.09 2.425a4.7 4.7 0 0 1-.577.766a6.55 6.55 0 0 1-3.318 1.964c-2.333.57-4.669.603-6.99-.13c-2.645-.835-4.221-2.777-4.277-5.392A9.1 9.1 0 0 1 5.76 8.907c.36-.654.558-1.327.503-2.067a26 26 0 0 1-.05-.972l-.025-.565q.401.084.792.212c1.011.406 2.007.592 3.102.294a5.6 5.6 0 0 1 1.902-.122a4.76 4.76 0 0 0 2.921-.714c.218-.128.439-.251.681-.387"/></svg>';
 
-  /* 按仓库 URL 返回对应平台图标 SVG */
   function platformIconSVG(url) {
     var u = String(url || "").toLowerCase();
     if (u.indexOf("github.com") !== -1) return GITHUB_ICON_SVG;
@@ -316,7 +313,7 @@
     );
   }
 
-  /* initNav：根据 pathname 高亮当前导航项 */
+  /* initNav 函数可根据 pathname 高亮当前导航项 */
   function initNav() {
     var path = window.location.pathname;
     var links = document.querySelectorAll(".site-nav .nav-item");
@@ -342,7 +339,7 @@
     }
   }
 
-  /* mountNav：渲染导航到 #site-nav 占位元素，并绑定事件 */
+  /* mountNav 函数可渲染导航到 #site-nav 占位元素，并绑定事件 */
   function mountNav() {
     var holder = document.getElementById("site-nav");
     if (!holder) return;
@@ -354,7 +351,7 @@
     initMoreMenu(holder);
   }
 
-  /* initMoreMenu：移动端三点菜单的展开/关闭 */
+  /* initMoreMenu 函数控制移动端三点菜单的展开关闭 */
   function initMoreMenu(holder) {
     var btn = holder.querySelector(".nav-more");
     var panel = holder.querySelector(".nav-more-panel");
@@ -416,11 +413,12 @@
   global.mountFooterLogo = mountFooterLogo;
 
   /* ---------- 通用搜索框 ----------
-     selector:        挂载点选择器（空元素，渲染后获得 .search-box 类）
-     opts.placeholder:输入框占位文本（同时作为 aria-label）
-     opts.onQuery:    输入回调，参数为 trim 后的字符串（防抖 150ms）
-     返回控制器 { setQuery, getQuery, focus }；opts.onQuery 在 query 变化时触发。
-     样式见 common.css .search-box；明暗主题通过 CSS 变量自动适配。 */
+     selector:         挂载点选择器
+     opts.placeholder: 输入框占位文本
+     opts.onQuery:     输入回调，参数为 trim 后的字符串
+     返回控制器 { setQuery, getQuery, focus }；
+     opts.onQuery 在 query 变化时触发；
+     样式见 common.css 里的 .search-box。 */
   var SEARCH_ICON_SVG =
     '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">' +
     '<path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.499 4.499 0 1 0-9 0 4.499 4.499 0 0 0 9 0Z"/></svg>';

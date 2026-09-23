@@ -1,8 +1,6 @@
 /* ============================================================
-   repo.js - 项目页 & 首页精选项目共享逻辑
-   功能：项目列表加载、GitHub 仓库详情获取、项目卡片渲染
-   依赖：common.js（Utils / fetchGitHubJSON / root）
-   加载页面：/index.html（精选项目）、/repo/index.html（全部项目）
+   repo.js - 项目页逻辑
+   加载页面：/index.html、/repo/index.html
    ============================================================ */
 
 (function (global) {
@@ -13,7 +11,7 @@
   var fetchGitHubJSON = global.fetchGitHubJSON;
   var platformIconSVG = global.platformIconSVG;
 
-  /* ---------- star.json 数据加载 ---------- */
+  /* ---------- 精选项目数据加载 ---------- */
   function fetchStarProjects() {
     return utils.fetchJSON(root() + "repo/star.json").then(function (list) {
       return Array.isArray(list) ? list : [];
@@ -38,7 +36,7 @@
   /* ---------- GitHub 仓库详情获取 ---------- */
   var REPO_API = "https://api.github.com/repos/";
 
-  /* 获取仓库简介 + 真实 star 数 */
+  /* 获取仓库简介和真实 star 数 */
   function fetchRepoInfo(fullName) {
     var key = "repo:" + fullName;
     return fetchGitHubJSON(REPO_API + fullName, key).then(function (d) {
@@ -62,8 +60,7 @@
   }
   global.fetchRepoLanguages = fetchRepoLanguages;
 
-  /* 并发 enrich 单个项目：简介 / star / 技术栈
-     GitHub API 可用时以其为准（优先）；不可用时回退 JSON 预设的 desc / stars / tags */
+  /* 并发获取项目数据GitHub API 可用时以其为准 */
   function enrichProject(p) {
     if (!p || !p.full_name) return Promise.resolve(p);
     return Promise.all([
@@ -72,21 +69,19 @@
     ]).then(function (arr) {
       var info = arr[0], langs = arr[1];
       if (info) {
-        /* GitHub API 优先：覆盖 JSON 预设值 */
         if (info.desc) p.desc = info.desc;
         p.stars = info.stars;
-      } else {
-        /* API 不可用：保留 JSON 预设的简介与 star，仅当无简介时给兜底文案 */
+      }
+      else {
         if (!p.desc) p.desc = "暂无简介";
       }
-      /* 技术栈：API 返回语言列表时以 API 为准，否则回退 JSON 预设 tags */
       p.tags = (langs && langs.length) ? langs : (p.tags || []);
       return p;
     });
   }
   global.enrichProject = enrichProject;
 
-  /* 项目搜索匹配：name / id / desc / 技术栈 / full_name 任一含 query（大小写不敏感） */
+  /* 项目搜索匹配 */
   function matchProject(p, q) {
     if (!q) return true;
     var fields = [p.name, p.id, p.desc, (p.tags || []).join(" "), p.full_name];
@@ -97,8 +92,7 @@
   }
   global.matchProject = matchProject;
 
-  /* ---------- 选择弹窗 ----------
-     title: 弹窗标题；items: [{ title, url }] */
+  /* ---------- 选择弹窗 ---------- */
   function openSelectDialog(title, items) {
     var old = document.getElementById("pc-dialog");
     if (old) old.remove();
@@ -136,7 +130,7 @@
     document.addEventListener("keydown", onKey);
   }
 
-  /* 项目源码按钮处理：有 other_repo 时弹窗（首项 GitHub + other_repo），无则直接跳转 */
+  /* 项目源码按钮处理 */
   function handleSourceRepo(repo, otherRepo) {
     var items = [{ title: "GitHub", url: repo }];
     if (Array.isArray(otherRepo)) {
@@ -145,14 +139,13 @@
     openSelectDialog("选择项目源码仓库", items);
   }
 
-  /* ---------- Vue 项目卡片渲染（封装，供页面调用） ----------
+  /* ---------- Vue 项目卡片渲染 ----------
      selector: 挂载点选择器
      list:     项目数组
-     perRow:   每行列数（2 / 3 / null=自适应）
-     labels:   按钮文案 { primary, secondary }
-     返回控制器 { setQuery }：setQuery(q) 触发响应式过滤重渲染；
-     首页精选项目不接收返回值，query 恒为空，行为与原先一致。
-  ---------- */
+     perRow:   每行列数
+     labels:   按钮文案
+     返回控制器 setQuery(q) 可触发响应式过滤重渲染；
+     但首页精选项目不接收返回值。 */
   function projectCardVNode(h, p, labels) {
     var tags = (p.tags || []).map(function (t) {
       return h("span", { class: "pc-tag" }, t);
@@ -162,14 +155,9 @@
       ? h("div", { class: "pc-tags" }, [h("span", { class: "pc-tag pc-tag-loading" }, "…")])
       : (tags.length ? h("div", { class: "pc-tags" }, tags) : h("div", { class: "pc-tags" }, []));
     var actions = [];
-    if (p.url) {
-      actions.push(h("a", { class: "btn btn-primary", href: p.url, target: "_blank", rel: "noopener" }, labels.primary));
-    }
-    if (Array.isArray(p.other_repo) && p.other_repo.length) {
-      actions.push(h("button", { class: "btn", type: "button", onClick: function () { handleSourceRepo(p.repo, p.other_repo); } }, labels.secondary));
-    } else {
-      actions.push(h("a", { class: "btn", href: p.repo, target: "_blank", rel: "noopener" }, labels.secondary));
-    }
+    if (p.url) actions.push(h("a", { class: "btn btn-primary", href: p.url, target: "_blank", rel: "noopener" }, labels.primary));
+    if (Array.isArray(p.other_repo) && p.other_repo.length) actions.push(h("button", { class: "btn", type: "button", onClick: function () { handleSourceRepo(p.repo, p.other_repo); } }, labels.secondary));
+    else actions.push(h("a", { class: "btn", href: p.repo, target: "_blank", rel: "noopener" }, labels.secondary));
     return h("article", { class: "card project-card", key: p.id }, [
       h("div", { class: "pc-title" }, p.name),
       h("div", { class: "pc-desc" }, descText),
@@ -193,9 +181,6 @@
     if (!container) return null;
     var cls = "project-grid" + (perRow ? " project-grid-" + perRow : "");
     var lab = Object.assign({ primary: "访问主页", secondary: "项目源码" }, labels || {});
-
-    /* 本地优先：先用 JSON 预设数据（desc/stars/tags）立即渲染，
-       再后台调 GitHub API enrich，成功则覆盖更新，失败保留本地。 */
     var initial = list.map(function (p) {
       return Object.assign({}, p, {
         tags: (p.tags || []).slice(),
@@ -216,7 +201,7 @@
         onMounted(function () {
           projects.value.forEach(function (p, i) {
             enrichProject(p).then(function () {
-              /* enrich 就地更新（API 成功覆盖，失败保留本地），赋新对象触发重渲染 */
+              /* enrich 就地更新，赋新对象触发重渲染 */
               projects.value[i] = Object.assign({}, p);
             });
           });

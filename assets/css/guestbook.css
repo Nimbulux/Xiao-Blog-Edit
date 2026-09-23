@@ -1,6 +1,6 @@
 /* ============================================================
-   guestbook.css - 留言板样式（自制发布表单 + 卡片式留言墙）
-   加载页面：/guestbook/index.html
+   guestbook.css - 留言页样式
+   加载页面：/index.html、/guestbook/index.html
    ============================================================ */
 
 /* ---------- 发布表单 ---------- */
@@ -82,7 +82,7 @@
   flex-direction: column;
   position: relative;
 }
-/* #id 徽章（卡片右上角） */
+/* 卡片右上角 #id 徽章 */
 .gb-id {
   position: absolute;
   top: 10px;
@@ -152,7 +152,7 @@
 .gb-body a { color: var(--link); }
 .gb-body a:hover { color: var(--link-hover); }
 
-/* ---------- 留言正文（支持 Markdown） ---------- */
+/* ---------- 留言正文 ---------- */
 .gb-body p { margin: 0 0 10px; }
 .gb-body p:last-child { margin-bottom: 0; }
 .gb-body a { color: var(--link); }
@@ -201,9 +201,9 @@
 }
 .gb-body img { max-width: 100%; border-radius: 6px; margin: 4px 0; }
 .gb-body table { border-collapse: collapse; margin: 0 0 10px; font-size: 13px; }
-  .gb-body th, .gb-body td { border: 1px solid var(--border); padding: 6px 10px; }
+.gb-body th, .gb-body td { border: 1px solid var(--border); padding: 6px 10px; }
 
-/* 正文截断（多列时超过 5 行）+ 展开按钮 */
+/* 正文截断与展开按钮 */
 .gb-body.is-clamp {
   flex: 0 0 auto;
   display: -webkit-box;
@@ -293,7 +293,7 @@
 }
 .gb-dialog-body::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* ---------- 移动端：表单两列堆叠 ---------- */
+/* ---------- 移动端表单两列堆叠样式 ---------- */
 @media (max-width: 600px) {
   .gb-form-row { flex-direction: column; }
 }

@@ -1,4 +1,7 @@
-/* about.js - 关于页：网站统计 */
+/* ============================================================
+   about.js - 关于页逻辑
+   加载页面：/about/index.html
+   ============================================================ */
 (function (global) {
   "use strict";
 
@@ -17,7 +20,7 @@
     return "/docs/" + ids.map(encodeURIComponent).join("/") + "/index.md";
   }
 
-  /* 仅统计实际存在 index.md 的文档（HEAD 探测） */
+  /* 仅统计实际存在 index.md 的文档 */
   function countExistingDocs(list) {
     var nodes = [];
     walkDocs(list, [], nodes);
@@ -52,7 +55,7 @@
     }
   }
 
-  /* 并行拉取各数据源计算统计 */
+  /* 拉取各数据源计算统计 */
   Promise.all([
     fetch("/docs/DocsList.json").then(function (r) { return r.json(); }).catch(function () { return []; }),
     fetch("/repo/RepoList.json").then(function (r) { return r.json(); }).catch(function () { return []; }),

@@ -1,7 +1,7 @@
-/* functions/rss.xml.js
-   动态生成 RSS 2.0 订阅源 → /rss.xml
-   读取 /docs/DocsList.json，递归遍历所有节点，
-   GET 读取 index.md，提取首段摘要填入 <description>。 */
+/* ============================================================
+   functions/rss.xml.js - 动态生成 RSS 订阅源
+   路由：/rss.xml
+   ============================================================ */
 const SITE = "https://xiao-blog.top";
 const DOCS = "/docs/";
 const SUMMARY_MAX = 200;
@@ -70,7 +70,8 @@ export async function onRequestGet(context) {
     try {
       var resp = await env.ASSETS.fetch(new Request(SITE + DOCS + "DocsList.json"));
       if (resp.ok) list = await resp.json();
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   var nodes = [];

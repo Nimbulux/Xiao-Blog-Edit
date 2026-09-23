@@ -1,8 +1,5 @@
 /* ============================================================
    guestbook.js - 留言板专属逻辑
-   后端：Cloudflare Pages Functions + D1（xiao-guestbook）
-   功能：发布表单（昵称 + 可选 QQ 号获取头像 + Markdown 内容）、留言墙卡片渲染、搜索、刷新、预览、本地缓存
-   依赖：common.js（Utils / showNotice / mountSearchBox）+ gb-card.js（GBCard）+ marked + DOMPurify
    加载页面：/guestbook/index.html
    ============================================================ */
 
@@ -15,7 +12,7 @@
   var wallBox = null;
   var wallData = [];
 
-  /* ---------- 留言墙本地缓存（1 天 TTL） ---------- */
+  /* ---------- 留言墙本地缓存 ---------- */
   var GB_WALL_CACHE_KEY = "gb_wall";
   var GB_WALL_CACHE_TTL = 24 * 60 * 60 * 1000;
   function readWallCache() {
@@ -34,7 +31,7 @@
     } catch (e) {}
   }
 
-  /* 卡片渲染共享模块（formatTime/renderBody/gbCardHTML）来自 gb-card.js */
+  /* 卡片渲染共享模块 */
   var gbCard = global.GBCard;
 
   /* ---------- 留言墙渲染 ---------- */
@@ -47,7 +44,7 @@
         "</div>";
       return;
     }
-    /* 按 id 倒序排列（id 递增即时间递增，最新在前） */
+    /* 按 id 倒序排列 */
     var sorted = items.slice().sort(function (a, b) {
       return (b.id || 0) - (a.id || 0);
     });
@@ -77,7 +74,7 @@
     applyWall();
   }
 
-  /* ---------- 刷新按钮转圈 ---------- */
+  /* ---------- 刷新按钮 ---------- */
   var refreshCount = 0;
   function setRefreshSpinning(on) {
     var btn = document.getElementById("guestbook-refresh");
@@ -86,7 +83,8 @@
       refreshCount++;
       btn.classList.add("gb-refreshing");
       btn.disabled = true;
-    } else {
+    }
+    else {
       refreshCount = Math.max(0, refreshCount - 1);
       if (refreshCount === 0) {
         btn.classList.remove("gb-refreshing");
@@ -95,7 +93,7 @@
     }
   }
 
-  /* 刷新留言墙：调 API 拉取全部留言 */
+  /* 刷新留言墙 */
   function refreshWall() {
     setRefreshSpinning(true);
     return fetch(API_URL).then(function (res) {
@@ -107,9 +105,7 @@
       writeWallCache(list);
     }).catch(function (err) {
       console.warn("[guestbook] 加载失败：", err);
-      if (!wallData.length) {
-        wallBox.innerHTML = '<div class="status-box">留言加载失败，请稍后重试。</div>';
-      }
+      if (!wallData.length) wallBox.innerHTML = '<div class="status-box">留言加载失败，请稍后重试。</div>';
     }).then(function () {
       setRefreshSpinning(false);
     });
@@ -141,7 +137,7 @@
     /* 由 QQ 号生成头像 URL */
     function avatarFromQQ(qq) {
       if (!qq) return "";
-      if (!/^\d{5,11}$/.test(qq)) return null;  /* 格式不合法 */
+      if (!/^\d{5,11}$/.test(qq)) return null;
       return "https://q1.qlogo.cn/g?b=qq&nk=" + qq + "&s=640";
     }
 
@@ -184,7 +180,7 @@
       });
     });
 
-    /* 预览留言：弹窗显示与留言墙一致的卡片 */
+    /* 预览留言 */
     var previewBtn = document.getElementById("gb-preview");
     if (previewBtn) {
       previewBtn.addEventListener("click", function () {

@@ -1,9 +1,6 @@
 /* ============================================================
-   docs.js - Wiki 子系统
-   功能：DocsList 加载、侧边栏渲染、上下页分页、文章详情页初始化、
-         Markdown 正文渲染
-   依赖：common.js（Utils / root）
-   加载页面：/docs/index.html、/docs/article
+   docs.js - 文档页逻辑
+   加载页面：/docs/index.html、/docs/article.html
    ============================================================ */
 
 (function (global) {
@@ -16,10 +13,7 @@
   var DOCS_LIST_URL = DOCS_BASE + "DocsList.json";
   var docsListCache = null;
 
-  /* ---------- SEO 元数据（OG / Twitter Card / canonical / JSON-LD） ----------
-     文章页正文由 JS 运行时渲染，初始 <head> 仅有占位 meta；
-     此处根据当前文章的标题 / 正文 / URL 动态补全社交分享与结构化数据，
-     Googlebot 等支持 JS 的爬虫可在执行后抓到完整元信息。 */
+  /* ---------- SEO 元数据 ---------- */
   var SITE_ORIGIN = "https://xiao-blog.top";
   var SITE_AUTHOR = "ckckh2023";
   var SITE_AVATAR = "https://xiao-blog.top/assets/icons/head.jpg";
@@ -52,8 +46,7 @@
   }
 
   function setArticleMeta(opt) {
-    /* titlePath：从根到叶的标题数组，如 ["Github Pages 部署流程","github","概述"]；
-       fullTitle 反向拼接，headline 取最末一级 */
+    /* titlePath 为从根到叶的标题数组，fullTitle 反向拼接，headline 取最末一级 */
     var titlePath = opt.titlePath && opt.titlePath.length ? opt.titlePath : [opt.title || ""];
     var headline = titlePath[titlePath.length - 1];
     var fullTitle = titlePath.slice().reverse().join(" - ") + " - ckckh2023 文档";
@@ -122,18 +115,16 @@
     return true;
   }
 
-  /* 文章详情页链接：ids 为 id 路径数组，如 ["deploy","github","overview"]
-      → /docs/article?id=deploy&sub=github&sub2=overview
-     单层 ["vue-guide"] → ?id=vue-guide；两层 ["deploy","overview"] → ?id=deploy&sub=overview */
+  /* 文章详情页链接解析 */
   function docHref(ids) {
-     var base = DOCS_BASE + "article?id=" + encodeURIComponent(ids[0]);
+    var base = DOCS_BASE + "article?id=" + encodeURIComponent(ids[0]);
     if (ids[1]) base += "&sub=" + encodeURIComponent(ids[1]);
     if (ids[2]) base += "&sub2=" + encodeURIComponent(ids[2]);
     return base;
   }
   global.docHref = docHref;
 
-  /* 沿 id 路径查找节点；返回该层节点或 null */
+  /* 沿 id 路径查找节点 */
   function findNodeByPath(list, idPath) {
     var nodes = list;
     var node = null;
@@ -145,7 +136,7 @@
     return node;
   }
 
-  /* 沿 id 路径收集标题数组；路径无效返回 null */
+  /* 沿 id 路径收集标题数组 */
   function findTitlePath(list, idPath) {
     var nodes = list;
     var titles = [];
@@ -158,8 +149,7 @@
     return titles;
   }
 
-  /* 从 node 沿第一个 child 递归到叶子，返回完整 id 路径；
-     parentIds 为 node 的父路径（不含 node.id） */
+  /* 从 node 沿第一个 child 递归到叶子，返回完整 id 路径 */
   function firstLeafIds(node, parentIds) {
     var ids = parentIds.concat(node.id);
     if (node.children && node.children.length) {
@@ -169,9 +159,7 @@
   }
   global.firstLeafIds = firstLeafIds;
 
-  /* 将 DocsList 递归展平为叶子分页序列：
-     每个叶子 → { ids: [...], titles: [...] }，均为从根到叶的路径
-     有 children 的非叶子节点不进入序列（点击会重定向到其第一个叶子） */
+  /* 将 DocsList 递归展平为叶子分页序列，但是有 children 的非叶子节点不进入序列 */
   function flattenDocsSequence(list) {
     var seq = [];
     function walk(nodes, parentIds, parentTitles) {
@@ -189,8 +177,7 @@
     return seq;
   }
 
-  /* 渲染左侧目录侧边栏；currentPath 为当前文章完整 id 路径（目录页传 null）
-     有 children 的节点渲染为折叠组，在当前路径上的组默认展开，其余折叠 */
+  /* 渲染左侧目录侧边栏 */
   function renderSidebar(currentPath) {
     var holder = document.getElementById("docs-sidebar");
     if (!holder) return Promise.resolve();
@@ -200,7 +187,7 @@
         html += renderSidebarNode(it, [], currentPath);
       });
       holder.innerHTML = html;
-      /* 折叠/展开：点整行或键盘 Enter/Space 切换 */
+      /* 折叠或展开可通过点整行或键盘 Enter 和 Space 切换 */
       if (!holder.__sidebarToggleBound) {
         var toggleGroup = function (group) {
           var isCollapsed = group.classList.toggle("collapsed");
@@ -229,10 +216,10 @@
 
   /* 递归渲染侧边栏节点：
      node        当前节点
-     parentIds   父路径 id 数组（不含 node.id）
-     currentPath 当前文章完整 id 路径（目录页传 null）
-     有 children → 折叠组（在当前路径上展开），内部递归渲染 children
-     无 children → 叶子链接 */
+     parentIds   父路径 id 数组
+     currentPath 当前文章完整 id 路径
+     有 children -> 折叠组，内部递归渲染 children
+     无 children -> 叶子链接 */
   function renderSidebarNode(node, parentIds, currentPath) {
     var ids = parentIds.concat(node.id);
     var depth = parentIds.length;
@@ -261,9 +248,7 @@
     }
   }
 
-  /* 渲染上一页/下一页按钮到 #pagination
-     将 DocsList 递归展平为叶子序列，按当前文章 id 路径定位前后；
-     跨章节连续分页（三层亦然）。 */
+  /* 渲染上一页/下一页按钮到 #pagination */
   function renderPagination(currentPath) {
     var holder = document.getElementById("pagination");
     if (!holder) return Promise.resolve();
@@ -302,12 +287,7 @@
   }
   global.renderPagination = renderPagination;
 
-  /* 文章模板页初始化：按 ?id=[&sub][&sub2] 渲染标题、面包屑、正文、侧边栏 + 分页
-     URL 层级：  单层 ?id=a          → docs/a/index.md
-                两层 ?id=a&sub=b    → docs/a/b/index.md
-                三层 ?id=a&sub=b&sub2=c → docs/a/b/c/index.md
-     - 路径指向非叶子（有 children）→ 重定向到其第一个叶子
-     - 路径无效 → 回目录页 */
+  /* 文章模板页初始化 */
   function initArticlePage() {
     var query = new URLSearchParams(window.location.search);
     var id = query.get("id") || "";
@@ -327,13 +307,13 @@
         window.location.replace(DOCS_BASE);
         return;
       }
-      /* 非叶子 → 重定向到第一个叶子 */
+      /* 非叶子 -> 重定向到第一个叶子 */
       if (node.children && node.children.length) {
         window.location.replace(docHref(firstLeafIds(node, idPath.slice(0, -1))));
         return;
       }
 
-      /* 叶子文章 → 渲染 */
+      /* 叶子文章 -> 渲染文档 */
       var titlePath = findTitlePath(list, idPath) || [id];
       var title = titlePath[titlePath.length - 1];
       var mdUrl = DOCS_BASE + idPath.join("/") + "/index.md";
@@ -348,7 +328,7 @@
       var h1 = document.getElementById("doc-title");
       if (h1) h1.textContent = title;
 
-      /* 面包屑：沿层级路径渲染，前 N-1 级为链接（点击跳该层第一个叶子），末级为当前 */
+      /* 面包屑沿层级路径渲染，前 N-1 级为链接，点击可跳该层第一个叶子，末级为当前 */
       var breadcrumb = document.getElementById("doc-breadcrumb");
       if (breadcrumb) {
         if (idPath.length > 1) {
@@ -389,9 +369,7 @@
   }
   global.initArticlePage = initArticlePage;
 
-  /* ---------- 代码块复制按钮 ----------
-     渲染后给每个 <pre> 右上角加正方形复制图标，
-     点击复制 code 文本，临时变对勾反馈。 */
+  /* ---------- 代码块复制按钮 ---------- */
   var COPY_SVG =
     '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">' +
     '<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/>' +
@@ -427,7 +405,8 @@
         };
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(text).then(done).catch(function () {});
-        } else {
+        }
+        else {
           done();
         }
       });
@@ -448,10 +427,10 @@
 
   /* ---------- Markdown 正文渲染 ----------
       selector: 正文容器选择器
-      mdUrl:    markdown 文件 URL（相对路径即可，如 ./index.md）
-    ---------- */
+      mdUrl:    markdown 文件 URL */
 
-  /* 从 HTTP Last-Modified 头解析并填充最后更新日期 */
+  /* 从 HTTP Last-Modified 头解析并填充最后更新日期
+  （不知道为什么 Cloudflare Pages 无效，但是 GitHub Pages 有效，所以先保留） */
   function fillDocUpdated(lastModified) {
     var el = document.getElementById("doc-updated");
     if (!el || !lastModified) return;
@@ -478,9 +457,7 @@
       var mdDir = mdUrl.slice(0, mdUrl.lastIndexOf("/") + 1);
       box.querySelectorAll("img").forEach(function (img) {
         var s = img.getAttribute("src");
-        if (s && !/^(https?:)?\/\//i.test(s) && !/^data:/i.test(s) && s.charAt(0) !== "/") {
-          img.src = mdDir + s;
-        }
+        if (s && !/^(https?:)?\/\//i.test(s) && !/^data:/i.test(s) && s.charAt(0) !== "/") img.src = mdDir + s;
       });
       highlightCodeBlocks(box);
       enhanceCodeBlocks(box);

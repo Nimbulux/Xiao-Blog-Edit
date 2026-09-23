@@ -1,5 +1,5 @@
 /* ============================================================
-   home.css - 首页专属样式
+   home.css - 首页样式
    加载页面：/index.html
    ============================================================ */
 
@@ -23,7 +23,7 @@
   user-select: none;
 }
 
-/* ---------- 首页：个人信息 ---------- */
+/* ---------- 个人信息 ---------- */
 .profile-card {
   display: flex;
   align-items: center;
@@ -68,7 +68,7 @@
 }
 .fade-in { animation: fadeInUp 0.5s ease forwards; }
 
-/* ---------- 精选 Wiki 卡片 ---------- */
+/* ---------- 精选文档卡片 ---------- */
 .wiki-card {
   display: flex;
   flex-direction: column;
