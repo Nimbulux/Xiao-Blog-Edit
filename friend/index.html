@@ -46,9 +46,7 @@
   <script src="/assets/js/common.js"></script>
   <script src="/assets/js/friend.js"></script>
   <script>
-    /* 全部好友：从 /friend/FriendList.json 加载，复用首页卡片设计，每行 2 个；
-       头像缺失时以 ID 首字母占位，点击右下角"访问主页"跳转好友主页；
-       搜索框对 ID / 简介实时过滤 */
+    /* 全部好友：从 /friend/FriendList.json 加载 */
     var allFriends = [];
 
     function matchFriend(it, q) {
@@ -63,8 +61,7 @@
     function renderFriends(list, hasQuery) {
       var box = document.getElementById("all-friends");
       if (!list.length) {
-        box.innerHTML = '<div class="status-box">' +
-          (hasQuery ? "未找到匹配的好友。" : "暂无好友。") + "</div>";
+        box.innerHTML = '<div class="status-box">' + (hasQuery ? "未找到匹配的好友。" : "暂无好友。") + "</div>";
         return;
       }
       mountFriendGrid("#all-friends", list, 2);

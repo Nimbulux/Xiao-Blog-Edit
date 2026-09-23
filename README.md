@@ -50,8 +50,6 @@
     └── sitemap.xml.js      # 动态 sitemap 生成
 ```
 
-各栏目下的 `star.json` 为首页精选数据源：`repo/`、`docs/`、`share/` 为对象数组，`guestbook/` 为留言 id 数组（如 `[5, 10, 29]`）。
-
 ## 本地开发
 
 ```bash

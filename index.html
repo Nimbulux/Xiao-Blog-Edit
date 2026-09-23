@@ -41,7 +41,7 @@
         <div class="profile-name-wrapper">
           <h1 id="profile-name">加载中…</h1>
           <span class="handle-tag">@ckckh2023</span>
-		    </div>
+        </div>
         <div class="bio" id="profile-bio"></div>
         <div class="meta" id="profile-meta"></div>
       </div>
@@ -58,7 +58,7 @@
       </div>
     </section>
 
-    <!-- 精选文档 区块 -->
+    <!-- 精选文档区块 -->
     <section class="panel">
       <div class="section-title">
         <span>精选文档</span>
@@ -98,18 +98,18 @@
 
   <!-- 全局共享逻辑 -->
   <script src="/assets/js/common.js"></script>
-  <!-- Markdown 渲染 + 消毒（精选留言正文，与留言板一致） -->
+  <!-- Markdown 渲染 -->
   <script src="/assets/vendor/marked-14.1.4.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
-  <!-- 留言卡片共享渲染（精选留言，与留言板一致） -->
+  <!-- 留言卡片共享渲染 -->
   <script src="/assets/js/gb-card.js"></script>
-  <!-- 首页专属逻辑（GitHub Profile / 精选文档 / 精选留言） -->
+  <!-- 首页专属逻辑 -->
   <script src="/assets/js/home.js"></script>
-  <!-- 项目卡片渲染（首页精选项目 & 项目页共享） -->
+  <!-- 项目卡片渲染 -->
   <script src="/assets/js/repo.js"></script>
-  <!-- 分享卡片渲染（首页精选分享 & 分享页共享） -->
+  <!-- 分享卡片渲染 -->
   <script src="/assets/js/share.js"></script>
-  <!-- Vue 3 本地构建（同 unpkg vue@3 vue.global.js） -->
+  <!-- Vue 3 本地构建 -->
   <script src="/assets/vendor/vue-3.5.41.global.js"></script>
   <script>
     /* GitHub Octicon SVG */
@@ -127,8 +127,7 @@
       if (p.location) meta.push(ICON_LOCATION + " " + p.location);
       if (p.public_repos) meta.push(ICON_REPO + " " + p.public_repos + " repos");
       if (p.followers) meta.push(ICON_PEOPLE + " " + p.followers + " followers");
-      document.getElementById("profile-meta").innerHTML =
-        meta.map(function (t) { return "<span>" + t + "</span>"; }).join("");
+      document.getElementById("profile-meta").innerHTML = meta.map(function (t) { return "<span>" + t + "</span>"; }).join("");
     }
     fetchLocalProfile().then(function (p) {
       renderProfile(p);
@@ -137,7 +136,7 @@
       });
     });
 
-    /* 精选项目：从 /repo/star.json 加载，每行 2 个，简介 / star / 技术栈由 GitHub API enrich */
+    /* 精选项目：从 /repo/star.json 加载，由本地内容与 GitHub API 获取 */
     fetchStarProjects().then(function (list) {
       mountProjectGrid("#featured-projects", list.slice(0, 2), 2, {
         primary: "访问主页",
@@ -145,12 +144,12 @@
       });
     });
 
-    /* 精选文档：从 /docs/star.json 加载，每行 2 个，最多 4 篇，点击查看直接跳转对应 url */
+    /* 精选文档：从 /docs/star.json 加载 */
     fetchStarDocs().then(function (list) {
       mountWikiCards("#featured-wiki", list, 2, 4);
     });
 
-    /* 精选分享：从 /share/star.json 加载，每行 2 个，复用分享页卡片样式 */
+    /* 精选分享：从 /share/star.json 加载 */
     fetchStarShares().then(function (list) {
       mountShareGrid("#featured-share", list, 2);
     });

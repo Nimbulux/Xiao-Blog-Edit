@@ -71,15 +71,15 @@
   <script src="/assets/js/share.js"></script>
   <script>
     /* 软件列表：/share/SoftWareList.json；其他列表：/share/OtherList.json
-       分类切换条直接切换数据源（不再依赖 item.category 字段）。
-       筛选链路：分类(software/other) → 标签 → 平台 → 搜索框，四级叠加。
-       搜索仅作用于当前分类的数据集（符合直觉：在"软件"下搜只搜软件）。
-       侧边栏标签由当前分类下的项目聚合（按频次降序）；
-       平台为固定清单，按 item.platforms 过滤（多选取交集，与标签一致）。 */
+       分类切换条直接切换数据源；
+       筛选链路由分类到标签到平台到搜索框四级叠加；
+       搜索仅作用于当前分类的数据集；
+       侧边栏标签由当前分类下的项目按频次降序聚合；
+       平台为固定清单，按 item.platforms 过滤。 */
     var softwareList = [];
     var otherList = [];
-    var loadedState = {};  /* 已加载完成的分类：software / other */
-    var loadingState = {}; /* 加载中的 Promise，防止重复请求 */
+    var loadedState = {}; /* 已加载完成的分类 */
+    var loadingState = {}; /* 加载中的 Promise */
     var filterState = { category: "software", platforms: [], tags: [], query: "" };
     var PLATFORMS = ["Windows", "macOS", "Linux", "Web", "Android", "iOS"];
 
@@ -87,7 +87,7 @@
       return cat === "other" ? fetchOtherList() : fetchShareList();
     }
 
-    /* 确保某分类数据已加载：software 只拉 SoftWareList.json，other 只拉 OtherList.json */
+    /* 确保某分类数据已加载 */
     function ensureLoaded(cat) {
       if (loadedState[cat]) return Promise.resolve();
       if (!loadingState[cat]) {
@@ -113,7 +113,7 @@
       return false;
     }
 
-    /* 聚合标签：统计频次，按频次降序（同频按字母序） */
+    /* 聚合标签统计频次 */
     function collectTags(list) {
       var map = {};
       list.forEach(function (it) {
@@ -133,10 +133,10 @@
       var box = document.getElementById("share-tags");
       var info = document.getElementById("share-tags-info");
       if (filterState.tags.length) {
-        info.innerHTML = '<span>已选 ' + filterState.tags.length + ' 个</span>' +
-          '<button type="button" class="share-tags-clear" id="share-tags-clear">清空</button>';
+        info.innerHTML = '<span>已选 ' + filterState.tags.length + ' 个</span>' + '<button type="button" class="share-tags-clear" id="share-tags-clear">清空</button>';
         info.classList.add("visible");
-      } else {
+      } 
+      else {
         info.innerHTML = "";
         info.classList.remove("visible");
       }
@@ -146,12 +146,11 @@
       }
       box.innerHTML = tags.map(function (t) {
         var active = filterState.tags.indexOf(t.tag) !== -1 ? " active" : "";
-        return '<button class="share-tag-btn' + active + '" type="button" data-tag="' +
-          Utils.escapeHTML(t.tag) + '">' + Utils.escapeHTML(t.tag) + "</button>";
+        return '<button class="share-tag-btn' + active + '" type="button" data-tag="' + Utils.escapeHTML(t.tag) + '">' + Utils.escapeHTML(t.tag) + "</button>";
       }).join("");
     }
 
-    /* 渲染平台筛选按钮：固定清单 + 平台图标（图标定义见 share.js 的 PLATFORM_ICONS） */
+    /* 渲染平台筛选按钮 */
     function renderPlatformList() {
       var box = document.getElementById("share-platforms");
       if (!box) return;
@@ -159,8 +158,7 @@
       box.innerHTML = PLATFORMS.map(function (p) {
         var active = filterState.platforms.indexOf(p) !== -1 ? " active" : "";
         var icon = icons[p] || "";
-        return '<button class="share-platform-btn' + active + '" type="button" ' +
-          'data-platform="' + p + '" title="' + p + '">' + icon + p + "</button>";
+        return '<button class="share-platform-btn' + active + '" type="button" ' + 'data-platform="' + p + '" title="' + p + '">' + icon + p + "</button>";
       }).join("");
     }
 
@@ -188,16 +186,13 @@
       }
       var box = document.getElementById("all-shares");
       if (!list.length) {
-        box.innerHTML = '<div class="status-box">' +
-          (filterState.platforms.length || filterState.tags.length || filterState.query ? "未找到匹配的项目。" : "暂无分享。") +
-          "</div>";
+        box.innerHTML = '<div class="status-box">' + (filterState.platforms.length || filterState.tags.length || filterState.query ? "未找到匹配的项目。" : "暂无分享。") + "</div>";
         return;
       }
       mountShareGrid("#all-shares", list, 2);
     }
 
-    /* URL 双映射同步：type 控制分类，name 控制搜索词。
-       切换分类 / 搜索均用 replaceState 静默同步地址栏，便于分享与刷新保持状态。 */
+    /* URL 双映射同步 */
     function syncURL() {
       var params = new URLSearchParams();
       params.set("type", filterState.category);
@@ -212,7 +207,7 @@
       if (indicator) indicator.classList.toggle("right", filterState.category === "other");
     }
 
-    /* 分类切换条：切换到未加载过的分类时才请求对应 JSON */
+    /* 分类切换条 */
     document.getElementById("share-toggle").addEventListener("click", function (e) {
       var btn = e.target.closest(".share-toggle-btn");
       if (!btn) return;
@@ -231,7 +226,7 @@
       });
     });
 
-    /* 标签点击：多选切换 */
+    /* 标签点击与多选切换 */
     document.getElementById("share-tags").addEventListener("click", function (e) {
       var btn = e.target.closest(".share-tag-btn");
       if (!btn) return;
@@ -251,7 +246,7 @@
       applyFilter();
     });
 
-    /* 平台点击：多选切换 */
+    /* 平台点击与多选切换 */
     document.getElementById("share-platforms").addEventListener("click", function (e) {
       var btn = e.target.closest(".share-platform-btn");
       if (!btn) return;
@@ -263,13 +258,10 @@
       applyFilter();
     });
 
-    /* 平台清单为固定项，不依赖数据加载，直接渲染 */
+    /* 渲染平台清单 */
     renderPlatformList();
 
-    /* 按需加载当前分类数据源即可，另一分类在切换时才请求。
-       URL 双映射：?type=software|other 切换分类，&name=xxx 预填搜索词。
-       例如 /share/?type=software&name=db-browser-sqlite 进入即在软件分类下搜索。
-       初始访问 /share/ 会静默补全为 ?type=software，便于后续切换地址可辨。 */
+    /* 加载当前分类数据源 */
     var params = new URLSearchParams(location.search);
     var initType = params.get("type");
     var initName = (params.get("name") || "").trim();
@@ -277,9 +269,7 @@
     if (initName) filterState.query = initName;
     applyCategoryUI();
 
-    /* 动态 canonical / og:url：按分类指向自身，去掉 name 搜索参数，
-       使 /share/?type=software 与 /share/?type=other 各自独立索引，
-       ?name=xxx 搜索变体合并到对应分类页。 */
+    /* 动态 canonical 与  og:url */
     var canonURL = "https://xiao-blog.top/share/?type=" + filterState.category;
     var canonicalEl = document.head.querySelector('link[rel="canonical"]');
     if (canonicalEl) canonicalEl.setAttribute("href", canonURL);
