@@ -7,7 +7,7 @@
 (function () {
   var STORAGE_KEY = "theme";
   var TS_KEY = "theme-ts";
-  var TTL = 30 * 60 * 1000;
+  var TTL = 10 * 60 * 1000;
 
   function manualThemeValid() {
     try {
