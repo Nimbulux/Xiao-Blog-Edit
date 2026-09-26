@@ -200,6 +200,25 @@
       "aria-label": "下一页", title: "下一页",
       onClick: function () { if (current < pages) onPick(current + 1); }
     }, "›"));
+    /* 跳转到指定页 */
+    btns.push(h("span", { class: "pg-jump" }, [
+      "跳转到第",
+      h("input", {
+        class: "pg-jump-input", type: "number", min: "1", inputmode: "numeric",
+        placeholder: "页", "aria-label": "跳转到第几页",
+        onKeydown: function (e) {
+          if (e.key !== "Enter") return;
+          var v = parseInt(e.target.value, 10);
+          if (isNaN(v)) return;
+          if (v < 1) v = 1;
+          if (v > pages) v = pages;
+          e.target.value = "";
+          e.target.blur();
+          onPick(v);
+        }
+      }),
+      "页"
+    ]));
     return h("div", { class: "pagination" }, btns);
   }
 

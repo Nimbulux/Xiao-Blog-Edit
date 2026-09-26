@@ -594,6 +594,7 @@
       var nextDisabled = cur === pages;
       html += '<button class="pg-btn pg-nav" type="button" data-page="' + (cur + 1) + '"' +
         (nextDisabled ? " disabled" : "") + ' aria-label="下一页" title="下一页">›</button>';
+      html += '<span class="pg-jump">跳转到第<input class="pg-jump-input" type="number" min="1" inputmode="numeric" placeholder="页" aria-label="跳转到第几页">页</span>';
       holder.className = "pagination";
       holder.innerHTML = html;
     }
@@ -606,6 +607,21 @@
       if (isNaN(p)) return;
       if (scrollAnchor) smoothScrollTo(scrollAnchor);
       onChange(p);
+    });
+    /* 跳转输入框 */
+    holder.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      var input = e.target.closest(".pg-jump-input");
+      if (!input) return;
+      var v = parseInt(input.value, 10);
+      if (isNaN(v)) return;
+      var pages = Math.max(1, Math.ceil(total / pageSize));
+      if (v < 1) v = 1;
+      if (v > pages) v = pages;
+      input.value = "";
+      input.blur();
+      if (scrollAnchor) smoothScrollTo(scrollAnchor);
+      onChange(v);
     });
 
     return {

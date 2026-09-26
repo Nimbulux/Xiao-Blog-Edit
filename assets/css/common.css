@@ -565,6 +565,43 @@ mark {
   color: var(--text-muted);
   font-size: 14px;
 }
+/* 上一页/下一页箭头字号翻倍，更醒目 */
+.pg-btn.pg-nav {
+  font-size: 28px;
+  font-weight: 600;
+}
+/* 跳转到第 __ 页：输入框套用方块按钮外观 */
+.pg-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.pg-jump-input {
+  width: 48px;
+  height: 36px;
+  text-align: center;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 0 4px;
+  transition: border-color 0.2s ease;
+}
+.pg-jump-input:focus {
+  outline: none;
+  border-color: var(--link);
+}
+.pg-jump-input::-webkit-inner-spin-button,
+.pg-jump-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.pg-jump-input { -moz-appearance: textfield; }
 
 /* ---------- 手机端默认 90% 缩放 ---------- */
 @media (max-width: 768px) {
