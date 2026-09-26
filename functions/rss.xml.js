@@ -5,6 +5,8 @@
 const SITE = "https://xiao-blog.top";
 const DOCS = "/docs/";
 const SUMMARY_MAX = 200;
+const AVATAR = SITE + "/assets/icons/head.jpg";
+const SITE_TITLE = "ckckh2023 的博客";
 
 function docHref(ids) {
   var url = DOCS + "article?id=" + encodeURIComponent(ids[0]);
@@ -94,11 +96,16 @@ export async function onRequestGet(context) {
   var items = fetched.filter(function (n) { return n !== null; });
 
   var xml = '<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0">\n  <channel>\n';
-  xml += "    <title>" + escapeXML("ckckh2023 的博客") + "</title>\n";
+  xml += "    <title>" + escapeXML(SITE_TITLE) + "</title>\n";
   xml += "    <link>" + SITE + "</link>\n";
   xml += "    <description>" + escapeXML("记录学习与开发经验，分享实用工具与资源") + "</description>\n";
   xml += "    <language>zh-CN</language>\n";
   xml += "    <lastBuildDate>" + new Date().toUTCString() + "</lastBuildDate>\n";
+  xml += "    <image>\n";
+  xml += "      <url>" + escapeXML(AVATAR) + "</url>\n";
+  xml += "      <title>" + escapeXML(SITE_TITLE) + "</title>\n";
+  xml += "      <link>" + SITE + "</link>\n";
+  xml += "    </image>\n";
   items.forEach(function (it) {
     var url = SITE + docHref(it.ids);
     xml += "    <item>\n";
