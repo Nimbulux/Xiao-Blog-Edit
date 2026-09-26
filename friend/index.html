@@ -48,6 +48,11 @@
   <script>
     /* 全部好友：从 /friend/FriendList.json 加载 */
     var allFriends = [];
+    var friendFiltered = [];
+    var friendQuery = "";
+    var friendPage = 1;
+    var friendPager = null;
+    var FRIEND_PAGE_SIZE = 8;
 
     function matchFriend(it, q) {
       if (!q) return true;
@@ -59,23 +64,44 @@
       return false;
     }
 
-    function renderFriends(list, hasQuery, q) {
+    function applyFriends() {
       var box = document.getElementById("all-friends");
-      if (!list.length) {
-        box.innerHTML = '<div class="status-box">' + (hasQuery ? "未找到匹配的好友。" : "暂无好友。") + "</div>";
+      var q = friendQuery;
+      friendFiltered = allFriends.filter(function (it) { return matchFriend(it, q); });
+      if (!friendFiltered.length) {
+        box.innerHTML = '<div class="status-box">' + (q ? "未找到匹配的好友。" : "暂无好友。") + "</div>";
+        if (friendPager) { friendPager.destroy(); }
         return;
       }
-      mountFriendGrid("#all-friends", list, 2, q);
+      var pages = Math.ceil(friendFiltered.length / FRIEND_PAGE_SIZE);
+      if (friendPage > pages) friendPage = 1;
+      var start = (friendPage - 1) * FRIEND_PAGE_SIZE;
+      mountFriendGrid("#all-friends", friendFiltered.slice(start, start + FRIEND_PAGE_SIZE), 2, q);
+
+      var holder = ensurePaginationHolder("#all-friends", "friend-pagination");
+      if (!holder) return;
+      if (pages > 1) {
+        if (!friendPager) {
+          friendPager = mountPagination("#friend-pagination", {
+            total: friendFiltered.length,
+            pageSize: FRIEND_PAGE_SIZE,
+            current: friendPage,
+            onChange: function (p) { friendPage = p; applyFriends(); }
+          });
+        } else {
+          friendPager.setCurrent(friendPage, friendFiltered.length);
+        }
+      } else if (friendPager) {
+        friendPager.destroy();
+      }
     }
 
     fetchFriendList().then(function (list) {
       allFriends = list;
-      renderFriends(allFriends, false, "");
+      applyFriends();
       mountSearchBox("#friend-search", {
         placeholder: "搜索好友…",
-        onQuery: function (q) {
-          renderFriends(allFriends.filter(function (it) { return matchFriend(it, q); }), !!q, q);
-        }
+        onQuery: function (q) { friendQuery = q; friendPage = 1; applyFriends(); }
       });
     });
   </script>

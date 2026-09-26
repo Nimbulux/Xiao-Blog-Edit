@@ -526,6 +526,96 @@
   }
   global.highlightHTML = highlightHTML;
 
+  /* ---------- 通用分页 ---------- */
+  function buildPageItems(total, pageSize, current, surround) {
+    var pages = Math.max(1, Math.ceil(total / pageSize));
+    if (pages <= 1) return [];
+    if (current < 1) current = 1;
+    if (current > pages) current = pages;
+    surround = surround || 1;
+    var set = {};
+    set[1] = true;
+    set[pages] = true;
+    for (var i = current - surround; i <= current + surround; i++) {
+      if (i >= 1 && i <= pages) set[i] = true;
+    }
+    var nums = Object.keys(set).map(Number).sort(function (a, b) { return a - b; });
+    var items = [];
+    for (var j = 0; j < nums.length; j++) {
+      if (j > 0 && nums[j] - nums[j - 1] > 1) items.push("...");
+      items.push(nums[j]);
+    }
+    return items;
+  }
+  global.buildPageItems = buildPageItems;
+
+  function mountPagination(selector, opts) {
+    var holder = document.querySelector(selector);
+    if (!holder) return null;
+    opts = opts || {};
+    var total = opts.total || 0;
+    var pageSize = opts.pageSize || 10;
+    var current = opts.current || 1;
+    var surround = opts.surround || 1;
+    var onChange = typeof opts.onChange === "function" ? opts.onChange : function () {};
+
+    function render(cur) {
+      var pages = Math.max(1, Math.ceil(total / pageSize));
+      if (pages <= 1) { holder.innerHTML = ""; return; }
+      if (cur < 1) cur = 1;
+      if (cur > pages) cur = pages;
+      var items = buildPageItems(total, pageSize, cur, surround);
+      var html = "";
+      var prevDisabled = cur === 1;
+      html += '<button class="pg-btn pg-nav" type="button" data-page="' + (cur - 1) + '"' +
+        (prevDisabled ? " disabled" : "") + ' aria-label="上一页" title="上一页">‹</button>';
+      items.forEach(function (it) {
+        if (it === "...") html += '<span class="pg-ellipsis" aria-hidden="true">…</span>';
+        else {
+          var active = it === cur;
+          html += '<button class="pg-btn' + (active ? " pg-active" : "") + '" type="button" data-page="' + it + '"' +
+            (active ? ' aria-current="page"' : "") + ">" + it + "</button>";
+        }
+      });
+      var nextDisabled = cur === pages;
+      html += '<button class="pg-btn pg-nav" type="button" data-page="' + (cur + 1) + '"' +
+        (nextDisabled ? " disabled" : "") + ' aria-label="下一页" title="下一页">›</button>';
+      holder.className = "pagination";
+      holder.innerHTML = html;
+    }
+
+    render(current);
+    holder.addEventListener("click", function (e) {
+      var btn = e.target.closest(".pg-btn");
+      if (!btn || btn.disabled) return;
+      var p = parseInt(btn.getAttribute("data-page"), 10);
+      if (isNaN(p)) return;
+      onChange(p);
+    });
+
+    return {
+      setCurrent: function (p, newTotal) {
+        if (newTotal != null) total = newTotal;
+        render(p);
+      },
+      destroy: function () { holder.innerHTML = ""; }
+    };
+  }
+  global.mountPagination = mountPagination;
+
+  /* 在指定元素之后确保存在一个分页容器，返回该容器 */
+  function ensurePaginationHolder(afterSelector, id) {
+    var holder = document.getElementById(id);
+    if (holder) return holder;
+    var after = document.querySelector(afterSelector);
+    if (!after) return null;
+    holder = document.createElement("div");
+    holder.id = id;
+    after.parentNode.insertBefore(holder, after.nextSibling);
+    return holder;
+  }
+  global.ensurePaginationHolder = ensurePaginationHolder;
+
   /* ---------- 自动挂载 ---------- */
   document.addEventListener("DOMContentLoaded", function () {
     mountNav();

@@ -11,6 +11,9 @@
 
   var wallBox = null;
   var wallData = [];
+  var GB_PAGE_SIZE = 30;
+  var wallPage = 1;
+  var wallPager = null;
 
   /* ---------- 留言墙本地缓存 ---------- */
   var GB_WALL_CACHE_KEY = "gb_wall";
@@ -44,12 +47,8 @@
         "</div>";
       return;
     }
-    /* 按 id 倒序排列 */
-    var sorted = items.slice().sort(function (a, b) {
-      return (b.id || 0) - (a.id || 0);
-    });
     wallBox.innerHTML = '<div class="guestbook-wall">' +
-      sorted.map(function (c) { return gbCard.gbCardHTML(c, q); }).join("") + "</div>";
+      items.map(function (c) { return gbCard.gbCardHTML(c, q); }).join("") + "</div>";
     gbCard.setupClamp(wallBox);
   }
 
@@ -63,10 +62,39 @@
            String(body).toLowerCase().indexOf(q) !== -1;
   }
   function applyWall() {
+    if (!wallBox) return;
     var q = wallQuery.toLowerCase().trim();
     var list = wallData;
     if (q) list = wallData.filter(function (c) { return matchComment(c, q); });
-    mountWall(list, !!q, wallQuery);
+    /* 按 id 倒序排列 */
+    list = list.slice().sort(function (a, b) { return (b.id || 0) - (a.id || 0); });
+    if (!list.length) {
+      wallBox.innerHTML = '<div class="status-box">' +
+        (q ? "未找到匹配的留言。" : "还没有留言，在上方写下第一条吧。") + "</div>";
+      if (wallPager) wallPager.destroy();
+      return;
+    }
+    var pages = Math.ceil(list.length / GB_PAGE_SIZE);
+    if (wallPage > pages) wallPage = 1;
+    var start = (wallPage - 1) * GB_PAGE_SIZE;
+    mountWall(list.slice(start, start + GB_PAGE_SIZE), !!q, wallQuery);
+
+    var holder = ensurePaginationHolder("#guestbook-wall", "guestbook-pagination");
+    if (!holder) return;
+    if (pages > 1) {
+      if (!wallPager) {
+        wallPager = mountPagination("#guestbook-pagination", {
+          total: list.length,
+          pageSize: GB_PAGE_SIZE,
+          current: wallPage,
+          onChange: function (p) { wallPage = p; applyWall(); }
+        });
+      } else {
+        wallPager.setCurrent(wallPage, list.length);
+      }
+    } else if (wallPager) {
+      wallPager.destroy();
+    }
   }
 
   function setWall(list) {
@@ -170,6 +198,7 @@
         }
         inputBody.value = "";
         setHint("留言发布成功！");
+        wallPage = 1; /* 发布成功后回到第一页 */
         /* 清除本地缓存，确保刷新后立即看到新留言 */
         try { localStorage.removeItem(GB_WALL_CACHE_KEY); } catch (e) {}
         refreshWall();
@@ -224,7 +253,7 @@
 
     mountSearchBox("#gb-search", {
       placeholder: "搜索留言…",
-      onQuery: function (q) { wallQuery = q; applyWall(); }
+      onQuery: function (q) { wallQuery = q; wallPage = 1; applyWall(); }
     });
   });
 })(window);

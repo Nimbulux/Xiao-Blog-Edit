@@ -80,8 +80,10 @@
     var otherList = [];
     var loadedState = {}; /* 已加载完成的分类 */
     var loadingState = {}; /* 加载中的 Promise */
-    var filterState = { category: "software", platforms: [], tags: [], query: "" };
+    var filterState = { category: "software", platforms: [], tags: [], query: "", page: 1 };
     var PLATFORMS = ["Windows", "macOS", "Linux", "Web", "Android", "iOS"];
+    var SHARE_PAGE_SIZE = 20;
+    var sharePager = null;
 
     function loadCategory(cat) {
       return cat === "other" ? fetchOtherList() : fetchShareList();
@@ -189,9 +191,30 @@
       var box = document.getElementById("all-shares");
       if (!list.length) {
         box.innerHTML = '<div class="status-box">' + (filterState.platforms.length || filterState.tags.length || filterState.query ? "未找到匹配的项目。" : "暂无分享。") + "</div>";
+        if (sharePager) sharePager.destroy();
         return;
       }
-      mountShareGrid("#all-shares", list, 2, filterState.query);
+      var pages = Math.ceil(list.length / SHARE_PAGE_SIZE);
+      if (filterState.page > pages) filterState.page = 1;
+      var start = (filterState.page - 1) * SHARE_PAGE_SIZE;
+      mountShareGrid("#all-shares", list.slice(start, start + SHARE_PAGE_SIZE), 2, filterState.query);
+
+      var holder = ensurePaginationHolder("#all-shares", "share-pagination");
+      if (!holder) return;
+      if (pages > 1) {
+        if (!sharePager) {
+          sharePager = mountPagination("#share-pagination", {
+            total: list.length,
+            pageSize: SHARE_PAGE_SIZE,
+            current: filterState.page,
+            onChange: function (p) { filterState.page = p; applyFilter(); }
+          });
+        } else {
+          sharePager.setCurrent(filterState.page, list.length);
+        }
+      } else if (sharePager) {
+        sharePager.destroy();
+      }
     }
 
     /* URL 双映射同步 */
@@ -218,6 +241,8 @@
       filterState.category = cat;
       filterState.platforms = []; /* 切换分类时重置已选平台 */
       filterState.tags = []; /* 切换分类时重置已选标签 */
+      filterState.page = 1; /* 切换分类时重置页码 */
+      if (sharePager) { sharePager.destroy(); sharePager = null; }
       renderPlatformList();
       applyCategoryUI();
       syncURL();
@@ -236,6 +261,7 @@
       var idx = filterState.tags.indexOf(tag);
       if (idx === -1) filterState.tags.push(tag);
       else filterState.tags.splice(idx, 1);
+      filterState.page = 1;
       renderTagList();
       applyFilter();
     });
@@ -244,6 +270,7 @@
     document.getElementById("share-tags-info").addEventListener("click", function (e) {
       if (e.target.id !== "share-tags-clear") return;
       filterState.tags = [];
+      filterState.page = 1;
       renderTagList();
       applyFilter();
     });
@@ -256,6 +283,7 @@
       var idx = filterState.platforms.indexOf(p);
       if (idx === -1) filterState.platforms.push(p);
       else filterState.platforms.splice(idx, 1);
+      filterState.page = 1;
       renderPlatformList();
       applyFilter();
     });
@@ -285,6 +313,7 @@
         placeholder: "搜索工具…",
         onQuery: function (q) {
           filterState.query = q;
+          filterState.page = 1;
           applyFilter();
           syncURL();
         }

@@ -517,6 +517,55 @@ mark {
 
 }
 
+/* ---------- 通用分页 ---------- */
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 28px;
+}
+.pg-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.pg-btn:hover:not(:disabled):not(.pg-active) {
+  color: var(--link);
+  border-color: var(--link);
+}
+.pg-btn.pg-active {
+  background: var(--link);
+  color: #fff;
+  border-color: var(--link);
+}
+.pg-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.pg-ellipsis {
+  min-width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
 /* ---------- 手机端默认 90% 缩放 ---------- */
 @media (max-width: 768px) {
   html { zoom: 0.9; }
