@@ -70,5 +70,5 @@
   });
 
   var em = document.getElementById("about-email");
-  if (em) em.href = "ma" + "ilto:" + "fighten" + "ed2023@wust.ed" + "u.cn";
+  if (em) em.href = "ma" + "ilto:" + "ckc" + "kh2023@wust.ed" + "u.cn";
 })(window);
