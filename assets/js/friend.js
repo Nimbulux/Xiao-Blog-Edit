@@ -25,10 +25,10 @@
      list:     好友数组
      perRow:   每行列数
      头像缺失时以 ID 首字母占位，且头像加载失败时回退到首字母占位。*/
-  function friendCardHTML(item) {
+  function friendCardHTML(item, q) {
     var id = item.id || "";
     var initial = (id.charAt(0) || "?").toUpperCase();
-    var bio = utils.escapeHTML(item.bio || "");
+    var bio = highlight(item.bio, q);
     var url = utils.escapeHTML(item.url || "#");
 
     /* 头像节点 */
@@ -44,7 +44,7 @@
 
     return '<article class="card friend-card">' +
       '<div class="fc-header">' + avatarNode +
-        '<div class="fc-id">' + utils.escapeHTML(id) + "</div>" +
+        '<div class="fc-id">' + highlight(id, q) + "</div>" +
       "</div>" +
       '<div class="fc-bio">' + bio + "</div>" +
       '<div class="fc-actions">' +
@@ -53,7 +53,7 @@
     "</article>";
   }
 
-  function mountFriendGrid(selector, list, perRow) {
+  function mountFriendGrid(selector, list, perRow, q) {
     var box = document.querySelector(selector);
     if (!box) return;
     var items = list || [];
@@ -63,7 +63,7 @@
     }
     var cls = "project-grid project-grid-" + (perRow || 2);
     box.innerHTML = '<div class="' + cls + '">' +
-      items.map(friendCardHTML).join("") + "</div>";
+      items.map(function (it) { return friendCardHTML(it, q); }).join("") + "</div>";
   }
   global.mountFriendGrid = mountFriendGrid;
 })(window);

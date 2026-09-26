@@ -483,6 +483,19 @@
   }
   global.mountSearchBox = mountSearchBox;
 
+  /* ---------- 搜索高亮 ----------
+     highlight(text, q)：先 escapeHTML 再用 <mark> 包裹匹配子串
+     保证安全（不会注入 HTML）且可链式用于卡片渲染 */
+  function highlight(text, q) {
+    var safe = utils.escapeHTML(text);
+    if (!q) return safe;
+    var qe = utils.escapeHTML(q);
+    /* 转义正则元字符 */
+    var re = new RegExp(qe.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    return safe.replace(re, "<mark>$&</mark>");
+  }
+  global.highlight = highlight;
+
   /* ---------- 自动挂载 ---------- */
   document.addEventListener("DOMContentLoaded", function () {
     mountNav();

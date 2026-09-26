@@ -58,22 +58,22 @@
       return false;
     }
 
-    function renderFriends(list, hasQuery) {
+    function renderFriends(list, hasQuery, q) {
       var box = document.getElementById("all-friends");
       if (!list.length) {
         box.innerHTML = '<div class="status-box">' + (hasQuery ? "未找到匹配的好友。" : "暂无好友。") + "</div>";
         return;
       }
-      mountFriendGrid("#all-friends", list, 2);
+      mountFriendGrid("#all-friends", list, 2, q);
     }
 
     fetchFriendList().then(function (list) {
       allFriends = list;
-      renderFriends(allFriends, false);
+      renderFriends(allFriends, false, "");
       mountSearchBox("#friend-search", {
         placeholder: "搜索好友…",
         onQuery: function (q) {
-          renderFriends(allFriends.filter(function (it) { return matchFriend(it, q); }), !!q);
+          renderFriends(allFriends.filter(function (it) { return matchFriend(it, q); }), !!q, q);
         }
       });
     });

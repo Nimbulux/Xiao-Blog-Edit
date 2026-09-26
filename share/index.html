@@ -189,7 +189,7 @@
         box.innerHTML = '<div class="status-box">' + (filterState.platforms.length || filterState.tags.length || filterState.query ? "未找到匹配的项目。" : "暂无分享。") + "</div>";
         return;
       }
-      mountShareGrid("#all-shares", list, 2);
+      mountShareGrid("#all-shares", list, 2, filterState.query);
     }
 
     /* URL 双映射同步 */

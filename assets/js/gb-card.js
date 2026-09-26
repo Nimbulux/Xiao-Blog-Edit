@@ -36,7 +36,7 @@
   }
 
   /* 留言卡片 */
-  function gbCardHTML(c) {
+  function gbCardHTML(c, q) {
     var hasId = c.id != null && c.id !== "";
     var name = c.nickname || "匿名";
     var avatar = c.avatar || "";
@@ -58,7 +58,7 @@
       idBadge +
       '<div class="gb-header">' + avatarNode +
         '<div class="gb-meta">' +
-          '<div class="gb-name">' + utils.escapeHTML(name) + "</div>" +
+          '<div class="gb-name">' + highlight(name, q) + "</div>" +
           '<div class="gb-time">' + utils.escapeHTML(time) + "</div>" +
         "</div>" +
       "</div>" +

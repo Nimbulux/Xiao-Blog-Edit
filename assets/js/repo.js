@@ -146,9 +146,9 @@
      labels:   按钮文案
      返回控制器 setQuery(q) 可触发响应式过滤重渲染；
      但首页精选项目不接收返回值。 */
-  function projectCardVNode(h, p, labels) {
+  function projectCardVNode(h, p, labels, q) {
     var tags = (p.tags || []).map(function (t) {
-      return h("span", { class: "pc-tag" }, t);
+      return h("span", { class: "pc-tag", innerHTML: highlight(t, q) });
     });
     var descText = p.loading ? "加载中…" : (p.desc || "暂无简介");
     var tagsNode = p.loading
@@ -159,8 +159,8 @@
     if (Array.isArray(p.other_repo) && p.other_repo.length) actions.push(h("button", { class: "btn", type: "button", onClick: function () { handleSourceRepo(p.repo, p.other_repo); } }, labels.secondary));
     else actions.push(h("a", { class: "btn", href: p.repo, target: "_blank", rel: "noopener" }, labels.secondary));
     return h("article", { class: "card project-card", key: p.id }, [
-      h("div", { class: "pc-title" }, p.name),
-      h("div", { class: "pc-desc" }, descText),
+      h("div", { class: "pc-title", innerHTML: highlight(p.name, q) }),
+      h("div", { class: "pc-desc", innerHTML: highlight(descText, q) }),
       tagsNode,
       h("div", { class: "pc-meta" }, [
         h("span", { class: "star" }, "★ " + (p.stars || 0)),
@@ -208,13 +208,14 @@
         });
         return function () {
           var items = filtered.value;
+          var q = query.value;
           if (!items.length) {
             return h("div", { class: cls }, [
               h("div", { class: "status-box" }, "未找到匹配的项目。")
             ]);
           }
           return h("div", { class: cls },
-            items.map(function (p) { return projectCardVNode(h, p, lab); })
+            items.map(function (p) { return projectCardVNode(h, p, lab, q); })
           );
         };
       }

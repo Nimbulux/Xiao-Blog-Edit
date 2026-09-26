@@ -35,7 +35,7 @@
   var gbCard = global.GBCard;
 
   /* ---------- 留言墙渲染 ---------- */
-  function mountWall(list, hasQuery) {
+  function mountWall(list, hasQuery, q) {
     if (!wallBox) return;
     var items = list || [];
     if (!items.length) {
@@ -49,7 +49,7 @@
       return (b.id || 0) - (a.id || 0);
     });
     wallBox.innerHTML = '<div class="guestbook-wall">' +
-      sorted.map(gbCard.gbCardHTML).join("") + "</div>";
+      sorted.map(function (c) { return gbCard.gbCardHTML(c, q); }).join("") + "</div>";
     gbCard.setupClamp(wallBox);
   }
 
@@ -66,7 +66,7 @@
     var q = wallQuery.toLowerCase().trim();
     var list = wallData;
     if (q) list = wallData.filter(function (c) { return matchComment(c, q); });
-    mountWall(list, !!q);
+    mountWall(list, !!q, wallQuery);
   }
 
   function setWall(list) {

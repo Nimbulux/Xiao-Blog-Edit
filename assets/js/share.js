@@ -121,10 +121,10 @@
   }
 
   /* ---------- 卡片渲染 ---------- */
-  function shareCardHTML(item, idx) {
+  function shareCardHTML(item, idx, q) {
     var name = item.name || item.id || "";
     var initial = (name.charAt(0) || "?").toUpperCase();
-    var desc = utils.escapeHTML(item.description || "");
+    var desc = highlight(item.description, q);
     var st = statusInfo(item.status);
 
     /* 图标节点 */
@@ -154,7 +154,7 @@
     if (Array.isArray(item.tags) && item.tags.length) {
       tagsHTML = '<div class="sc-tags">' +
         item.tags.map(function (t) {
-          return '<span class="sc-tag">' + utils.escapeHTML(t) + "</span>";
+          return '<span class="sc-tag">' + highlight(t, q) + "</span>";
         }).join("") + "</div>";
     }
 
@@ -172,7 +172,7 @@
       '<span class="sc-status ' + st.cls + '" title="' + utils.escapeHTML(st.label) +
         '" aria-label="' + utils.escapeHTML(st.label) + '"></span>' +
       '<div class="sc-header">' + iconNode +
-        '<div class="sc-name">' + utils.escapeHTML(name) + "</div>" +
+        '<div class="sc-name">' + highlight(name, q) + "</div>" +
       "</div>" +
       '<div class="sc-desc">' + desc + "</div>" +
       metaHTML +
@@ -186,7 +186,7 @@
     "</article>";
   }
 
-  function mountShareGrid(selector, list, perRow) {
+  function mountShareGrid(selector, list, perRow, q) {
     var box = document.querySelector(selector);
     if (!box) return;
     var items = list || [];
@@ -196,7 +196,7 @@
     }
     box._shareItems = items; /* 供事件委托读取，每次渲染刷新 */
     var cls = "project-grid project-grid-" + (perRow || 2);
-    box.innerHTML = '<div class="' + cls + '">' + items.map(function (item, idx) { return shareCardHTML(item, idx); }).join("") + "</div>";
+    box.innerHTML = '<div class="' + cls + '">' + items.map(function (item, idx) { return shareCardHTML(item, idx, q); }).join("") + "</div>";
 
     /* 事件委托仅绑定一次，避免重渲染累积监听器 */
     if (!box._shareBound) {

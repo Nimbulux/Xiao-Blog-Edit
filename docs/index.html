@@ -71,7 +71,7 @@
       return false;
     }
 
-    function renderDocsIndex(list, hasQuery) {
+    function renderDocsIndex(list, hasQuery, q) {
       var box = document.getElementById("docs-index-list");
       if (!list.length) {
         box.innerHTML = '<div class="status-box">' + (hasQuery ? "未找到匹配的文章。" : "暂无文章。") + "</div>";
@@ -80,7 +80,7 @@
       box.innerHTML = list.map(function (item) {
         var href = (item.children && item.children.length) ? docHref(firstLeafIds(item, [])) : docHref([item.id]);
         return '<a class="doc-item" href="' + href + '">' +
-          '<span class="doc-title">' + Utils.escapeHTML(item.title) + "</span>" +
+          '<span class="doc-title">' + highlight(item.title, q) + "</span>" +
           '<span class="doc-arrow">→</span>' +
         "</a>";
       }).join("");
@@ -88,11 +88,11 @@
 
     fetchDocsList().then(function (list) {
       allDocs = list;
-      renderDocsIndex(allDocs, false);
+      renderDocsIndex(allDocs, false, "");
       mountSearchBox("#docs-search", {
         placeholder: "搜索文章…",
         onQuery: function (q) {
-          renderDocsIndex(allDocs.filter(function (it) { return matchDoc(it, q); }), !!q);
+          renderDocsIndex(allDocs.filter(function (it) { return matchDoc(it, q); }), !!q, q);
         }
       });
     });

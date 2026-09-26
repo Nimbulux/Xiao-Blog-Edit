@@ -510,6 +510,15 @@ img { max-width: 100%; display: block; }
   .site-nav .nav-more-link.active { color: var(--text); font-weight: 700; background: var(--active-bg); }
 }
 
+/* ---------- 搜索高亮 ---------- */
+mark {
+  background: var(--active-bg);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+  box-shadow: none;
+}
+
 /* ---------- 手机端默认 90% 缩放 ---------- */
 @media (max-width: 768px) {
   html { zoom: 0.9; }
