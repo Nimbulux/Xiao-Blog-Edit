@@ -214,7 +214,7 @@
     if (!container) return null;
     var cls = "project-grid" + (perRow ? " project-grid-" + perRow : "");
     var lab = Object.assign({ primary: "访问主页", secondary: "项目源码" }, labels || {});
-    var PAGE_SIZE = 8;
+    var PAGE_SIZE = 10; /* 分页内卡片数量调节项 */
     var initial = list.map(function (p) {
       return Object.assign({}, p, {
         tags: (p.tags || []).slice(),
@@ -264,7 +264,10 @@
           var grid = h("div", { class: cls },
             paginated.value.map(function (p) { return projectCardVNode(h, p, lab, q); })
           );
-          var pg = paginationVNode(h, items.length, PAGE_SIZE, currentPage.value, function (p) { currentPage.value = p; });
+          var pg = paginationVNode(h, items.length, PAGE_SIZE, currentPage.value, function (p) {
+            if (global.smoothScrollTo) global.smoothScrollTo(container);
+            currentPage.value = p;
+          });
           return pg ? [grid, pg] : grid;
         };
       }

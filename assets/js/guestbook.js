@@ -87,6 +87,7 @@
           total: list.length,
           pageSize: GB_PAGE_SIZE,
           current: wallPage,
+          scrollAnchor: "#guestbook-wall",
           onChange: function (p) { wallPage = p; applyWall(); }
         });
       } else {

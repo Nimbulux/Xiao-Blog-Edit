@@ -549,6 +549,19 @@
   }
   global.buildPageItems = buildPageItems;
 
+  /* 平滑滚动到锚点顶部 */
+  function smoothScrollTo(anchor) {
+    var el = typeof anchor === "string" ? document.querySelector(anchor) : anchor;
+    if (!el) return;
+    var nav = document.getElementById("site-nav");
+    var navH = nav ? nav.offsetHeight : 0;
+    var top = el.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop || 0) - navH - 12;
+    if (top < 0) top = 0;
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: top, behavior: reduce ? "auto" : "smooth" });
+  }
+  global.smoothScrollTo = smoothScrollTo;
+
   function mountPagination(selector, opts) {
     var holder = document.querySelector(selector);
     if (!holder) return null;
@@ -558,6 +571,7 @@
     var current = opts.current || 1;
     var surround = opts.surround || 1;
     var onChange = typeof opts.onChange === "function" ? opts.onChange : function () {};
+    var scrollAnchor = opts.scrollAnchor;
 
     function render(cur) {
       var pages = Math.max(1, Math.ceil(total / pageSize));
@@ -590,6 +604,7 @@
       if (!btn || btn.disabled) return;
       var p = parseInt(btn.getAttribute("data-page"), 10);
       if (isNaN(p)) return;
+      if (scrollAnchor) smoothScrollTo(scrollAnchor);
       onChange(p);
     });
 

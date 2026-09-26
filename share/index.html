@@ -207,6 +207,7 @@
             total: list.length,
             pageSize: SHARE_PAGE_SIZE,
             current: filterState.page,
+            scrollAnchor: "#all-shares",
             onChange: function (p) { filterState.page = p; applyFilter(); }
           });
         } else {

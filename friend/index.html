@@ -86,6 +86,7 @@
             total: friendFiltered.length,
             pageSize: FRIEND_PAGE_SIZE,
             current: friendPage,
+            scrollAnchor: "#all-friends",
             onChange: function (p) { friendPage = p; applyFriends(); }
           });
         } else {
