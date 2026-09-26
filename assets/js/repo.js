@@ -178,9 +178,8 @@
     var btns = [];
     btns.push(h("button", {
       class: "pg-btn pg-nav", type: "button", disabled: current === 1,
-      "aria-label": "上一页", title: "上一页",
       onClick: function () { if (current > 1) onPick(current - 1); }
-    }, "‹"));
+    }, "上一页"));
     items.forEach(function (it) {
       if (it === "...") {
         btns.push(h("span", { class: "pg-ellipsis", "aria-hidden": "true" }, "…"));
@@ -197,15 +196,14 @@
     });
     btns.push(h("button", {
       class: "pg-btn pg-nav", type: "button", disabled: current === pages,
-      "aria-label": "下一页", title: "下一页",
       onClick: function () { if (current < pages) onPick(current + 1); }
-    }, "›"));
+    }, "下一页"));
     /* 跳转到指定页 */
     btns.push(h("span", { class: "pg-jump" }, [
       "跳转到第",
       h("input", {
         class: "pg-jump-input", type: "number", min: "1", inputmode: "numeric",
-        placeholder: "页", "aria-label": "跳转到第几页",
+        "aria-label": "跳转到第几页",
         onKeydown: function (e) {
           if (e.key !== "Enter") return;
           var v = parseInt(e.target.value, 10);

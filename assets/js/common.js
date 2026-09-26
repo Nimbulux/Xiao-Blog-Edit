@@ -582,7 +582,7 @@
       var html = "";
       var prevDisabled = cur === 1;
       html += '<button class="pg-btn pg-nav" type="button" data-page="' + (cur - 1) + '"' +
-        (prevDisabled ? " disabled" : "") + ' aria-label="上一页" title="上一页">‹</button>';
+        (prevDisabled ? " disabled" : "") + '>上一页</button>';
       items.forEach(function (it) {
         if (it === "...") html += '<span class="pg-ellipsis" aria-hidden="true">…</span>';
         else {
@@ -593,8 +593,8 @@
       });
       var nextDisabled = cur === pages;
       html += '<button class="pg-btn pg-nav" type="button" data-page="' + (cur + 1) + '"' +
-        (nextDisabled ? " disabled" : "") + ' aria-label="下一页" title="下一页">›</button>';
-      html += '<span class="pg-jump">跳转到第<input class="pg-jump-input" type="number" min="1" inputmode="numeric" placeholder="页" aria-label="跳转到第几页">页</span>';
+        (nextDisabled ? " disabled" : "") + '>下一页</button>';
+      html += '<span class="pg-jump">跳转到第<input class="pg-jump-input" type="number" min="1" inputmode="numeric" aria-label="跳转到第几页">页</span>';
       holder.className = "pagination";
       holder.innerHTML = html;
     }

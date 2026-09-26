@@ -565,12 +565,7 @@ mark {
   color: var(--text-muted);
   font-size: 14px;
 }
-/* 上一页/下一页箭头字号翻倍，更醒目 */
-.pg-btn.pg-nav {
-  font-size: 28px;
-  font-weight: 600;
-}
-/* 跳转到第 __ 页：输入框套用方块按钮外观 */
+/* 跳转到指定页输入框 */
 .pg-jump {
   display: inline-flex;
   align-items: center;
@@ -580,7 +575,7 @@ mark {
   color: var(--text-muted);
 }
 .pg-jump-input {
-  width: 48px;
+  width: 40px;
   height: 36px;
   text-align: center;
   font-size: 14px;
