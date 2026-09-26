@@ -19,14 +19,14 @@
   function renderBody(text) {
     var src = String(text == null ? "" : text);
     var parse = window.marked && (window.marked.parse || window.marked);
-    if (parse) {
+    /* 必须同时具备 marked 与 DOMPurify 才走 HTML 渲染路径；
+       DOMPurify 缺失时绝不直接注入 marked 输出，避免 XSS */
+    if (parse && window.DOMPurify) {
       var html = "";
       try { html = parse(src); } catch (e) { html = ""; }
-      if (html) {
-        if (window.DOMPurify) html = window.DOMPurify.sanitize(html);
-        return html;
-      }
+      if (html) return window.DOMPurify.sanitize(html);
     }
+    /* 纯文本 fallback：先 escape 再链接化，安全且保留可读性 */
     var s = utils.escapeHTML(src);
     s = s.replace(/(https?:\/\/[^\s<>"']+)/g, function (m) {
       return '<a href="' + m + '" target="_blank" rel="noopener">' + m + "</a>";
