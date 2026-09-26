@@ -455,13 +455,20 @@
       box.innerHTML = '<p class="status-box">Markdown 解析器未加载。</p>';
       return Promise.resolve();
     }
-    return fetch(mdUrl).then(function (r) {
+    /* 从 mdUrl 提取 idPath，走 /api/article 统一入口 */
+    var rel = mdUrl.replace(/^\/docs\//, "").replace(/\/index\.md$/, "");
+    var idPath = rel.split("/");
+    var apiUrl = "/api/article?id=" + encodeURIComponent(idPath[0]);
+    if (idPath[1]) apiUrl += "&sub=" + encodeURIComponent(idPath[1]);
+    if (idPath[2]) apiUrl += "&sub2=" + encodeURIComponent(idPath[2]);
+    var mdDir = mdUrl.slice(0, mdUrl.lastIndexOf("/") + 1);
+    return fetch(apiUrl).then(function (r) {
       if (!r.ok) throw new Error("HTTP " + r.status);
-      fillDocUpdated(r.headers.get("Last-Modified"));
-      return r.text();
-    }).then(function (md) {
-      box.innerHTML = parse(md);
-      var mdDir = mdUrl.slice(0, mdUrl.lastIndexOf("/") + 1);
+      return r.json();
+    }).then(function (data) {
+      if (!data || !data.ok) throw new Error((data && data.error) || "文章加载失败");
+      fillDocUpdated(data.date || data.lastModified);
+      box.innerHTML = parse(data.markdown);
       box.querySelectorAll("img").forEach(function (img) {
         var s = img.getAttribute("src");
         if (s && !/^(https?:)?\/\//i.test(s) && !/^data:/i.test(s) && s.charAt(0) !== "/") img.src = mdDir + s;
