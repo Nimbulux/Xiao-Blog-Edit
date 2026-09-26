@@ -105,10 +105,12 @@
     }
 
     function matchShare(it, q) {
+      if (!q) return true;
+      var ql = q.toLowerCase();
       var fields = [it.id, it.name, it.description];
       if (Array.isArray(it.tags)) fields = fields.concat(it.tags);
       for (var i = 0; i < fields.length; i++) {
-        if (fields[i] && String(fields[i]).toLowerCase().indexOf(q) !== -1) return true;
+        if (fields[i] && String(fields[i]).toLowerCase().indexOf(ql) !== -1) return true;
       }
       return false;
     }

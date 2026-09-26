@@ -494,6 +494,38 @@
   }
   global.highlight = highlight;
 
+  /* 在已渲染的 HTML 文本节点中安全插入 <mark> */
+  function highlightHTML(html, q) {
+    if (!q) return html;
+    var ql = q.toLowerCase();
+    var div = document.createElement("div");
+    div.innerHTML = html;
+    var qe = utils.escapeHTML(q);
+    var re = new RegExp(qe.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    var walker = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, null);
+    var nodes = [];
+    var node;
+    while ((node = walker.nextNode())) nodes.push(node);
+    nodes.forEach(function (textNode) {
+      var text = textNode.nodeValue;
+      if (text.toLowerCase().indexOf(ql) === -1) return;
+      var frag = document.createDocumentFragment();
+      var last = 0;
+      var m;
+      while ((m = re.exec(text)) !== null) {
+        if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+        var mark = document.createElement("mark");
+        mark.textContent = m[0];
+        frag.appendChild(mark);
+        last = m.index + m[0].length;
+      }
+      if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+      textNode.parentNode.replaceChild(frag, textNode);
+    });
+    return div.innerHTML;
+  }
+  global.highlightHTML = highlightHTML;
+
   /* ---------- 自动挂载 ---------- */
   document.addEventListener("DOMContentLoaded", function () {
     mountNav();

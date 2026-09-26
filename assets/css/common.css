@@ -514,9 +514,7 @@ img { max-width: 100%; display: block; }
 mark {
   background: var(--active-bg);
   color: inherit;
-  padding: 0 2px;
-  border-radius: 2px;
-  box-shadow: none;
+
 }
 
 /* ---------- 手机端默认 90% 缩放 ---------- */

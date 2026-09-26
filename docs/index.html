@@ -64,9 +64,10 @@
 
     function matchDoc(item, q) {
       if (!q) return true;
+      var ql = q.toLowerCase();
       var fields = [item.title, item.id];
       for (var i = 0; i < fields.length; i++) {
-        if (fields[i] && String(fields[i]).toLowerCase().indexOf(q) !== -1) return true;
+        if (fields[i] && String(fields[i]).toLowerCase().indexOf(ql) !== -1) return true;
       }
       return false;
     }

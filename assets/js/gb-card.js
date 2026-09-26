@@ -62,7 +62,7 @@
           '<div class="gb-time">' + utils.escapeHTML(time) + "</div>" +
         "</div>" +
       "</div>" +
-      '<div class="gb-body">' + renderBody(c.body) + "</div>" +
+      '<div class="gb-body">' + highlightHTML(renderBody(c.body), q) + "</div>" +
     "</article>";
   }
 
