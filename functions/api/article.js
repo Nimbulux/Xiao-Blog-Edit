@@ -2,9 +2,11 @@
    functions/api/article.js - 文章内容 API
    路由：GET /api/article?id=xxx[&sub=yyy][&sub2=zzz]
    返回：{ ok, markdown, lastModified, date, path }
-   - markdown：正文（已剥离 frontmatter）
-   - date：frontmatter 里的 date 字段（如有），用于 SEO/排序
-   - lastModified：ASSETS 返回的 Last-Modified 头（可能为空）
+
+   - markdown：正文
+   - date：frontmatter 里的 date 字段
+   - lastModified：ASSETS 返回的 Last-Modified 头
+
    Cache-Control: 5 分钟边缘缓存
    ============================================================ */
 
@@ -21,7 +23,7 @@ function json(data, status) {
   });
 }
 
-/* 解析 frontmatter，仅提取 date 字段，正文去掉 frontmatter 块 */
+/* 解析 frontmatter */
 function parseFrontmatter(md) {
   var m = /^---\r?\n([\s\S]*?)\r?\n---/.exec(md);
   if (!m) return { date: null, body: md };
@@ -46,7 +48,6 @@ export async function onRequestGet(context) {
   if (sub) parts.push(sub);
   if (sub2) parts.push(sub2);
 
-  /* 防御：每段只允许字母数字-_，避免路径穿越 */
   for (var i = 0; i < parts.length; i++) {
     if (!/^[A-Za-z0-9_\-]+$/.test(parts[i])) {
       return json({ ok: false, error: "非法 id 路径" }, 400);

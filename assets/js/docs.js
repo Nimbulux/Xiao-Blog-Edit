@@ -455,7 +455,7 @@
       box.innerHTML = '<p class="status-box">Markdown 解析器未加载。</p>';
       return Promise.resolve();
     }
-    /* 从 mdUrl 提取 idPath，走 /api/article 统一入口 */
+    /* 文章计数使用 /api/article.js 统一函数入口 */
     var rel = mdUrl.replace(/^\/docs\//, "").replace(/\/index\.md$/, "");
     var idPath = rel.split("/");
     var apiUrl = "/api/article?id=" + encodeURIComponent(idPath[0]);

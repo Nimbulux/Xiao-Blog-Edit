@@ -483,9 +483,7 @@
   }
   global.mountSearchBox = mountSearchBox;
 
-  /* ---------- 搜索高亮 ----------
-     highlight(text, q)：先 escapeHTML 再用 <mark> 包裹匹配子串
-     保证安全（不会注入 HTML）且可链式用于卡片渲染 */
+  /* ---------- 搜索高亮 ---------- */
   function highlight(text, q) {
     var safe = utils.escapeHTML(text);
     if (!q) return safe;

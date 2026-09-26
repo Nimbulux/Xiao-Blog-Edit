@@ -6,7 +6,7 @@
       POST /api/guestbook            发布留言
    数据表 messages：id, nickname, body, avatar, ip_hash, created_at
    id 策略：新留言 id = MAX(id) + 1
-   D1 绑定：env.GUESTBOOK（详见 wrangler.toml）
+   D1 绑定：详见 wrangler.toml 的 env.GUESTBOOK 配置项
    ============================================================ */
 
 const RATE_LIMIT_MS = 10 * 60 * 1000;   /* 每 IP 10 分钟一次 */
