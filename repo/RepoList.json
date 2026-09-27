@@ -13,6 +13,18 @@
     ]
   },
   {
+    "id": "Article_Manager",
+    "name": "Article_Manager",
+    "full_name": "Nimbulux/Article_Manager",
+    "url": "",
+    "repo": "https://github.com/Nimbulux/Article_Manager",
+    "desc": "Visual Studio Code 插件 用于管理我的文章",
+    "stars": 0,
+    "tags": [
+      "JavaScript"
+    ]
+  },
+  {
     "id": "fast-xp-pickup",
     "name": "fast-xp-pickup",
     "full_name": "Nimbulux/fast-xp-pickup",
@@ -35,6 +47,26 @@
     "tags": [
       "Python"
     ]
+  },
+  {
+    "id": "Nimbulux_Blog",
+    "name": "Nimbulux_Blog",
+    "full_name": "Nimbulux/Nimbulux_Blog",
+    "url": "",
+    "repo": "https://github.com/Nimbulux/Nimbulux_Blog",
+    "desc": "一个尝试着做成模板的博客页 按照我的审美制作的",
+    "stars": 0,
+    "tags": []
+  },
+  {
+    "id": "Website_Docs",
+    "name": "Website_Docs",
+    "full_name": "Nimbulux/Website_Docs",
+    "url": "",
+    "repo": "https://github.com/Nimbulux/Website_Docs",
+    "desc": "此目录为构建过后的文章目录",
+    "stars": 0,
+    "tags": []
   },
   {
     "id": "Xiao-Blog-Edit",
