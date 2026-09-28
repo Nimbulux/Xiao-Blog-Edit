@@ -56,7 +56,11 @@
     "repo": "https://github.com/Nimbulux/Nimbulux_Blog",
     "desc": "一个尝试着做成模板的博客页 按照我的审美制作的",
     "stars": 0,
-    "tags": []
+    "tags": [
+      "JavaScript",
+      "CSS",
+      "HTML"
+    ]
   },
   {
     "id": "Website_Docs",
@@ -84,7 +88,7 @@
   },
   {
     "id": "nimbulux.github.io",
-    "name": "一个博客",
+    "name": "一个网站",
     "full_name": "Nimbulux/nimbulux.github.io",
     "url": "https://nimbulux.github.io/",
     "repo": "https://github.com/Nimbulux/nimbulux.github.io",
@@ -93,8 +97,7 @@
     "tags": [
       "HTML",
       "Python",
-      "JavaScript",
-      "CSS"
+      "JavaScript"
     ]
   }
 ]

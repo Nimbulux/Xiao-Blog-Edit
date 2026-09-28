@@ -15,7 +15,7 @@
   },
   {
     "id": "nimbulux.github.io",
-    "name": "一个博客",
+    "name": "一个网站",
     "full_name": "Nimbulux/nimbulux.github.io",
     "url": "https://nimbulux.github.io/",
     "repo": "https://github.com/Nimbulux/nimbulux.github.io",
@@ -24,8 +24,7 @@
     "tags": [
       "HTML",
       "Python",
-      "JavaScript",
-      "CSS"
+      "JavaScript"
     ]
   }
 ]
