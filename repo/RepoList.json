@@ -63,6 +63,20 @@
     ]
   },
   {
+    "id": "Sinmai-Assist",
+    "name": "Sinmai-Assist",
+    "full_name": "Nimbulux/Sinmai-Assist",
+    "url": "",
+    "repo": "https://github.com/Nimbulux/Sinmai-Assist",
+    "desc": "Mods for maimai DX (Sinmai.exe). Patch with MelonLoader.",
+    "stars": 0,
+    "tags": [
+      "C#",
+      "Batchfile",
+      "Shell"
+    ]
+  },
+  {
     "id": "Website_Docs",
     "name": "Website_Docs",
     "full_name": "Nimbulux/Website_Docs",
